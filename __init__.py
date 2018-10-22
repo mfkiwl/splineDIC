@@ -9,3 +9,4 @@ __version__ = "1.0"
 __liscens__ = "MIT"
 
 import numpy as np
+from scipy import io as sio
