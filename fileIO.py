@@ -8,6 +8,8 @@
 
 from . import np
 from . import sio
+from . import os
+from . import cv2
 
 
 def read_mat_file(fname):
@@ -20,9 +22,49 @@ def read_mat_file(fname):
     :return: Dictionary containing .mat file contents
     :rtype: dict
     """
+    # Input checking
     if not fname.endswith('.mat'):
         raise ValueError('Input file should have a .mat extension, e.g. my_matlab_data.mat')
 
     data_dict = sio.loadmat(fname)
 
     return data_dict
+
+
+def read_tiff_stack(directory):
+
+    """
+    Read in all Tiff files in a given directory and return a dictionary of image values.
+
+    :param directory: Full path of directory containing TIFF images.
+    :type directory: stre
+    :return: dictionary of the image data. Format {image filename : image data as numpy array}
+    :rtype: dict
+    """
+    # Input checking
+    if not isinstance(directory, str):
+        raise TypeError('Input must be a full directory path as a string')
+
+    # Save the calling directory
+    calling_dir = os.getcwd()
+
+    # Change working directory to input directory
+    os.chdir(directory)
+
+    # Initialize image data dictionary
+    image_dict = {}
+
+    # Create list of directory's contents
+    directory_contents = os.listdir(directory)
+
+    # List comp over contents and read in only if extension is '.tiff' or '.tif'
+    tiff_files = [file for file in directory_contents if file.endswith('.tiff') or file.endswith('.tif')]
+
+    # Loop through the tiff_files and add their data to the dictionary
+    for i in range(0, len(tiff_files)):
+        image_dict[tiff_files[i]] = cv2.imread(tiff_files[i], 0)  # Read file in gray_scale mode
+
+    # Set working directory back to calling directoyr
+    os.chdir(calling_dir)
+
+    return image_dict
