@@ -10,7 +10,7 @@ from . import np
 from . import sio
 
 
-def read_mat(fname):
+def read_mat_file(fname):
 
     """
     Read in MATLAB .mat file and return the dictionary of values
