@@ -31,14 +31,15 @@ def read_mat_file(fname):
     return data_dict
 
 
-def read_tiff_stack(directory, read_mode=1):
+def read_tiff_stack(directory, read_mode=-1):
 
     """
     Read in all Tiff files in a given directory and return a dictionary of image values.
 
     :param directory: Full path of directory containing TIFF images.
     :type directory: str
-    :param read_mode: Optional. Parameter for controlling OpenCV image read flags. See OpenCV docs for details
+    :param read_mode: Optional. Parameter for controlling OpenCV image read flags. Default is to read as is
+    See OpenCV docs for details
     :return: dictionary of the image data. Format {image filename : image data as numpy array}
     :rtype: dict
     """
@@ -54,7 +55,7 @@ def read_tiff_stack(directory, read_mode=1):
         os.chdir(directory)
     except OSError as ex:
         print('Operating System Error')
-        raise
+        raise ex
 
     # Initialize image data dictionary
     image_dict = {}
@@ -78,7 +79,7 @@ def read_tiff_stack(directory, read_mode=1):
 def write_gray_tiff_stack(image_array, base_name, directory=None):
 
     """
-    Writes a 3 dimensional array of data to gray scale tiff image stacks.
+    Writes a 3 dimensional array of data to 16 bit gray scale tiff image stacks.
     :param image_array:
     :return:
     """
