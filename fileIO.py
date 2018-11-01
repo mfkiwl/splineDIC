@@ -20,6 +20,8 @@ def read_mat_file(fname):
     :return: Dictionary containing .mat file contents
     :rtype: dict
     """
+    if not fname.endswith('.mat'):
+        raise ValueError('Input file should have a .mat extension, e.g. my_matlab_data.mat')
 
     data_dict = sio.loadmat(fname)
 
