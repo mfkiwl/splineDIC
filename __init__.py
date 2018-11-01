@@ -11,3 +11,4 @@ __liscens__ = "MIT"
 import numpy as np
 from scipy import io as sio
 import os
+import cv2
