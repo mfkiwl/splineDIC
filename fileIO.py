@@ -50,7 +50,11 @@ def read_tiff_stack(directory, read_mode=1):
     calling_dir = os.getcwd()
 
     # Change working directory to input directory
-    os.chdir(directory)
+    try:
+        os.chdir(directory)
+    except OSError as ex:
+        print('Operating System Error')
+        raise
 
     # Initialize image data dictionary
     image_dict = {}
@@ -65,7 +69,16 @@ def read_tiff_stack(directory, read_mode=1):
     for i in range(0, len(tiff_files)):
         image_dict[tiff_files[i]] = cv2.imread(tiff_files[i], read_mode)  # Read file in based on read_mode param
 
-    # Set working directory back to calling directoyr
+    # Set working directory back to calling directory
     os.chdir(calling_dir)
 
     return image_dict
+
+
+def write_gray_tiff_stack(image_array, base_name, directory=None):
+
+    """
+    Writes a 3 dimensional array of data to gray scale tiff image stacks.
+    :param image_array:
+    :return:
+    """
