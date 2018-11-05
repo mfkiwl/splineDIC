@@ -13,3 +13,4 @@ from scipy import io as sio
 import os
 import cv2
 from matplotlib import pyplot as plt
+from matplotlib import cm
