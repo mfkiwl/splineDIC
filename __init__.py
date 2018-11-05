@@ -12,4 +12,4 @@ import numpy as np
 from scipy import io as sio
 import os
 import cv2
-from matplotlib import cm
+from matplotlib import pyplot as plt
