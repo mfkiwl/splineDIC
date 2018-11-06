@@ -10,9 +10,9 @@ from . import np
 from . import sio
 from . import os
 from . import cv2
-from . import plt
 from . import cm
 from . import utilities
+form . import errno
 
 
 def read_mat_file(fname):
@@ -57,7 +57,8 @@ def read_tiff_stack(directory, read_mode=-1):
     try:
         os.chdir(directory)
     except OSError as ex:
-        print('Operating System Error')
+        print('Operating System Error:')
+        print(OSError.strerror)
         raise ex
 
     # Initialize image data dictionary
@@ -83,8 +84,10 @@ def write_tiff_stack(data_array, base_name, directory=None, color_map='viridis')
 
     """
     Writes a 3 dimensional array of data to 16 bit tiff image stacks.
-    :param data_array: Data array to write to image. Shape N x Image X Size x Image Y Size. Assumed that input is not
-    normalized.
+
+    Allows options for specifying input directory and color map
+    :param data_array: Data array to write to image. Shape Number of Image Steps x Image X Size x Image Y Size.
+    Assumed that input is not normalized.
     :type data_array: numpy array
     :param base_name: base name string of output file. Will be appended with image index number and .tiff extension
     :type base_name: str
@@ -113,7 +116,19 @@ def write_tiff_stack(data_array, base_name, directory=None, color_map='viridis')
         start = os.getcwd()
 
         # Change directory
-        os.chdir(directory)
+        # Attempt to move into directory
+        try:
+            os.chdir(directory)
+        except OSError as ex:
+            if ex.errno != errno.ENOENT:
+                raise
+        # If directory doesn't exist, try to make it
+        try:
+            os.makdirs(directory)
+            os.chdir(directory)
+        except OSError:
+            print('Unable to move into or create requested output directory')
+            raise
 
     # Loop through every image in array and write output image
     for i in range(len(data_array)):
@@ -145,3 +160,37 @@ def write_tiff_stack(data_array, base_name, directory=None, color_map='viridis')
     if directory:
         # Move directory back to start
         os.chdir(start)
+
+
+def write_pSFDI_tiffs(data_dict, directory=None):
+
+    """
+    Writes all the pSFDI imaging data contained in the input dictionary as tiff stacks in their own unique directories
+
+    Allows for the user specification of top level output directory.
+
+    :param data_dict: Dictionary containing pSFDI data as arrays. Format: {name of pSFDI measure: 3D array of data}.
+    Data is formatted as Imaging Step Number x Image Size X x Image Size Y
+    :type data_dict: dict
+    :param directory: Optional. Full path specification of top level output directory
+    :type directory: str
+    :return: None
+    :rtype: None
+    """
+    # Check inputs
+    if not isinstance(data_dict, dict):
+        raise TypeError('Input must be a dictionary!')
+
+    # Check if directory needs to be changes
+    if directory:
+        # Check input
+        if not isinstance(directory, str):
+            raise ValueError('Output directory path must be a string!')
+
+        # Save current directory for later use
+        start = os.getcwd()
+
+        # Change directory
+        os.chdir(directory)
+
+
