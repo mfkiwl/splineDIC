@@ -12,7 +12,8 @@ from . import os
 from . import cv2
 from . import cm
 from . import utilities
-form . import errno
+from . import errno
+from . import regex
 
 
 def read_mat_file(fname):
@@ -128,6 +129,7 @@ def write_tiff_stack(data_array, base_name, directory=None, color_map='viridis')
             os.chdir(directory)
         except OSError:
             print('Unable to move into or create requested output directory')
+            print(directory)
             raise
 
     # Loop through every image in array and write output image
@@ -181,7 +183,7 @@ def write_pSFDI_tiffs(data_dict, directory=None):
     if not isinstance(data_dict, dict):
         raise TypeError('Input must be a dictionary!')
 
-    # Check if directory needs to be changes
+    # Check if directory needs to be changed
     if directory:
         # Check input
         if not isinstance(directory, str):
@@ -191,6 +193,37 @@ def write_pSFDI_tiffs(data_dict, directory=None):
         start = os.getcwd()
 
         # Change directory
-        os.chdir(directory)
+        # Attempt to move into directory
+        try:
+            os.chdir(directory)
+        except OSError as ex:
+            if ex.errno != errno.ENOENT:
+                raise
+        # If directory doesn't exist, try to make it
+        try:
+            os.makedirs(directory)
+            os.chdir(directory)
+        except OSError:
+            print('Unable to move into or create requested directory')
+            print(directory)
+            raise
 
+    # Loop over each element in the pSFDI data dictionary
+    for i in iter(data_dict):
+        # This could be a one-liner, but "readability counts" and so does clarity
+        # Extract the data array
+        data_array = data_dict[i]
+        # Extract the file name based on key name
+        base_name = i[3:]  # Chopping off first part of key name, e.g. 'ag_a0_DC' -> 'a0_DC'. BRITTLE
+        # Set color map based on the key name
+        if regex.findall('a0', base_name):
+            colormap = 'gray'
+        elif regex.findall('phi', base_name):
+            colormap = 'hsv'
+        else:
+            colormap = 'viridis'
+        # Call tiff stack writer with data array, name, directory (based on filename), and color map
+        write_tiff_stack(data_array, base_name, base_name, color_map=colormap)
 
+    if directory:
+        os.chdir(start)
