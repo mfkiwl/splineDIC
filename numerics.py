@@ -28,10 +28,6 @@ def image_interp(im_data, degree='cubic'):
     :return: Matrix of interpolating spline coefficients.
     :rtype: ndarray
     """
-    # Input checking
-    if not isinstance(im_data, np.ndarray):
-        raise TypeError('Input data must be a numpy array!')
-
     if im_data.ndim != 2:
         raise ValueError('Input data must be a two dimensional array')
 
