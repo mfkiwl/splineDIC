@@ -27,6 +27,8 @@ def read_mat_file(fname):
     :rtype: dict
     """
     # Input checking
+    # This check does not exactly conform to "Duck Typing", but I think it's useful because the exception thrown by
+    # the Scipy IO module is a little vague and can be confusing.
     if not fname.endswith('.mat'):
         raise ValueError('Input file should have a .mat extension, e.g. my_matlab_data.mat')
 
@@ -47,10 +49,6 @@ def read_tiff_stack(directory, read_mode=-1):
     :return: dictionary of the image data. Format {image filename : image data as numpy array}
     :rtype: dict
     """
-    # Input checking
-    if not isinstance(directory, str):
-        raise TypeError('Input must be a full directory path as a string')
-
     # Save the calling directory
     calling_dir = os.getcwd()
 
@@ -104,15 +102,8 @@ def write_tiff_stack(data_array, base_name, directory=None, color_map='viridis')
     if len(data_array.shape) != 3:
         raise ValueError('Data array must be three dimensional!')
 
-    if not isinstance(base_name, str):
-        raise TypeError('Base name for image output must be a string')
-
     # Check if directory needs to be changes
     if directory:
-        # Check input
-        if not isinstance(directory, str):
-            raise ValueError('Output directory path must be a string!')
-
         # Save current directory for later use
         start = os.getcwd()
 
@@ -179,16 +170,8 @@ def write_pSFDI_tiffs(data_dict, directory=None):
     :return: None
     :rtype: None
     """
-    # Check inputs
-    if not isinstance(data_dict, dict):
-        raise TypeError('Input must be a dictionary!')
-
     # Check if directory needs to be changed
     if directory:
-        # Check input
-        if not isinstance(directory, str):
-            raise ValueError('Output directory path must be a string!')
-
         # Save current directory for later use
         start = os.getcwd()
 
