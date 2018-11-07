@@ -125,7 +125,7 @@ def write_tiff_stack(data_array, base_name, directory=None, color_map='viridis')
                 raise
         # If directory doesn't exist, try to make it
         try:
-            os.makdirs(directory)
+            os.makedirs(directory)
             os.chdir(directory)
         except OSError:
             print('Unable to move into or create requested output directory')

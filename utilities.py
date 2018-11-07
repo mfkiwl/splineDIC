@@ -21,7 +21,7 @@ def normalize_2d(data_array):
     :rtype: None
     """
     # Check inputs (array must be two dimensional)
-    if len(data_array.shape) != 2:
+    if data_array.ndim != 2:
         raise ValueError('Input data must be 2D!')
 
     # Get max and min values

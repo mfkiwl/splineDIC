@@ -20,7 +20,7 @@ def image_interp(im_data, degree='cubic'):
 
     Biquintic interpolation is based on work by
     TODO: CITE UNSER ETC.
-    
+
     :param im_data: 2D numpy array of data to interpolate. Type can be float or unsigned int
     :type im_data: ndarray
     :param degree: Optional. Flag to control degree of spline interpolation. Default is cubic.
@@ -32,7 +32,7 @@ def image_interp(im_data, degree='cubic'):
     if not isinstance(im_data, np.ndarray):
         raise TypeError('Input data must be a numpy array!')
 
-    if len(np.shape) != 2:
+    if im_data.ndim != 2:
         raise ValueError('Input data must be a two dimensional array')
 
     # Compute and return interpolation
