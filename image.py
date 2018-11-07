@@ -15,17 +15,19 @@ class Image:
     Data storage and evaluation class for DIC image data
 
     Attributes
-    data: discrete image data values at each pixel level. Shape Size X x Size Y.
+    image_data: Ndarray. Discrete image data values at each pixel level. Shape Size X x Size Y.
+    data_type: str. String describing type of image data. Options: ['DIC', 'phi', 'DOA']
 
     Methods
     """
 
-    def __init__(self, data):
-        self._data = data
+    def __init__(self, image_data, data_type):
+        self._image_data = image_data
+        self._data_type = data_type
 
     # Data property definition
     @property
-    def data(self):
+    def image_data(self):
         """
         Image data
         2D Numpy array. Shape Size X x Size Y.
@@ -34,11 +36,11 @@ class Image:
         :setter: Set image data
         :type: ndarray
         """
-        return self._data
+        return self._image_data
 
     # Data property getter
-    @data.setter
-    def data(self, array):
+    @image_data.setter
+    def image_data(self, array):
         """
         Sets image data and performs type checking
 
@@ -48,13 +50,9 @@ class Image:
         :return: None
         :rtype: None
         """
-        # Input checking: Numpy array
-        if not isinstance(array, np.ndarray):
-            raise TypeError('Data must be a 2D Numpy Array')
-
         # Input checking: 2D array
         if array.ndim != 2:
             raise ValueError('Data shape must be 2D')
 
         # Set _data property
-        self._data = array
+        self._image_data = array
