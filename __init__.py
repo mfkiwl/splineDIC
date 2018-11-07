@@ -16,4 +16,4 @@ from matplotlib import pyplot as plt
 from matplotlib import cm
 import errno
 import regex
-import scipy.signal
+from scipy import signal
