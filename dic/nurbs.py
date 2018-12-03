@@ -152,15 +152,13 @@ def basis_function_ders(knot_span, knot, degree, knot_vector, deriv_order):
 
     return ders
 
-# TODO: Add find_span_linear
-def find_span_linear(degree, knot_vector, num_ctrlpts, knot):
+
+def find_span_linear(knot_vector, num_ctrlpts, knot):
 
     """
     Find the knot vector span of a single knot in a given knot vector using a naive linear search.
 
     Faster is Algoritm 2.1 from The NURBS Book, Piegl & Tiller 1997
-    :param degree: degree
-    :type degree: int
     :param knot_vector: knot vector
     :type knot_vector: ndarray
     :param num_ctrlpts: number of control points
@@ -175,7 +173,7 @@ def find_span_linear(degree, knot_vector, num_ctrlpts, knot):
     while span < num_ctrlpts and knot_vector[span] <= knot:
         span += 1
 
-    return span -1
+    return span - 1
 
 
 # TODO: Add find_span_binary
