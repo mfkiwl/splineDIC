@@ -172,7 +172,7 @@ def find_span_linear(degree, knot_vector, num_ctrlpts, knot):
     """
 
     span = 0  # Initialize span with a zero index
-    while span < num_ctrlpts and knot_vector[span] +<= knot:
+    while span < num_ctrlpts and knot_vector[span] <= knot:
         span += 1
 
     return span -1
