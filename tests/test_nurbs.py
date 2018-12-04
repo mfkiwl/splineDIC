@@ -42,3 +42,13 @@ def test_basis_functions2():
     basis_sum = np.sum(basis_vals)
 
     assert np.isclose(basis_sum, 1.0)
+
+# TODO: Add tests for:
+# TODO: Add find_span_binary
+# TODO: curve_point
+# TODO: curve_ders
+# TODO: check_knot_vec
+# TODO: generate_knot_vec
+
+# TODO: Add basis_functions_one
+# TODO: Add basis_functions_ders_one
