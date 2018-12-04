@@ -158,7 +158,7 @@ def find_span_linear(knot_vector, num_ctrlpts, knot):
     """
     Find the knot vector span of a single knot in a given knot vector using a naive linear search.
 
-    Faster is Algoritm 2.1 from The NURBS Book, Piegl & Tiller 1997
+    Faster is Algorithm 2.1 from The NURBS Book, Piegl & Tiller 1997
     :param knot_vector: knot vector
     :type knot_vector: ndarray
     :param num_ctrlpts: number of control points
