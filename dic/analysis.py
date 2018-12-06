@@ -107,7 +107,7 @@ def minfun(delta, nodes_ref, ref_im, def_im):
     return znssd
    
 
-def ratchetc(maxdx, maxdy, nodes_ref, ref_image, def_image):
+def ratchet(maxdx, maxdy, nodes_ref, ref_image, def_image):
 
 	"""
 	Compute rigid deformation by ratcheting window over image
