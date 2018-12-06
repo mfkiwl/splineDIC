@@ -8,6 +8,7 @@
 
 from . import np
 from . import signal
+from . import warnings
 
 
 
@@ -104,4 +105,38 @@ def minfun(delta, nodes_ref, ref_im, def_im):
     znssd = discrete_znssd(ref_subset, def_subset)
     
     return znssd
-    
+   
+
+def ratchetc(maxdx, maxdy, nodes_ref, ref_image, def_image):
+
+	"""
+	Compute rigid deformation by ratcheting window over image
+	
+	:param maxdx: maximum step in x
+	:type maxdx: int
+	:param maxdy: maximum step in y
+	:type maxdy: int
+	:param ref_image: reference image array
+	:type ref_image: ndarray
+`	:param def_image: deformed image array
+	:type def_image: ndarray
+	:return: displacement [dx dy]
+	:rtype:ndarray
+	"""
+	
+	minval = 1000
+	
+	for i in range(0, maxdx):
+		dx = i
+		for j in range(0, maxdy):
+			dy = j
+			delta = np.array([dx, dy])
+			retval = minfun(delta, nodes_ref, ref_image, def_image)
+			if retval < minval:
+				minval = retval
+			if np.isclose(minval, 0.0):
+				return np.array([dx, dy, minval])
+	
+	warnings.warn('Could not find exact minimum value')
+	return np.array([dx, dy, minval]) 
+
