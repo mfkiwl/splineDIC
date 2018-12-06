@@ -101,7 +101,7 @@ def minfun(delta, nodes_ref, ref_im, def_im):
     def_subset = def_im[miny_def:maxy_def, minx_def:maxx_def]
     
     # Compute ZNSSD
-    znssd = analysis.discrete_znssd(ref_subset, def_subset)
+    znssd = discrete_znssd(ref_subset, def_subset)
     
     return znssd
     
