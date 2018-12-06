@@ -58,3 +58,50 @@ def discrete_znssd(ref_image, def_image):
     return znssd
 
 
+
+# Could just do this sweeps
+def minfun(delta, nodes_ref, ref_im, def_im):
+    
+    """
+    Function for scipy minimizer to minimize
+
+    :param delta: 1D arrary of rigid body rotations
+    :type delata: ndarray
+    :return: ZNSSD of deformed ref and deformed image
+    :rtype: float
+    """
+    # TODO: Type checks
+    
+    # Get deltas
+    dx = delta[0]
+    dy = delta[1]
+    
+    # Deform the nodes
+    # Copy and update reference image locations only
+    nodes_def = np.copy(nodes_ref) # Copy
+    nodes_def[:, 0] += dx * np.ones(len(nodes_def))
+    nodes_def[:, 1] += dy * np.ones(len(nodes_def))
+    
+    
+    # Min/max nodes in x/y for ref and def
+    # TODO: Refactor
+    # Round values down as the step size must be interger valued
+    minx_ref = np.min(nodes_ref[:, 0]).astype('int')
+    miny_ref = np.min(nodes_ref[:, 1]).astype('int')
+    maxx_ref = np.max(nodes_ref[:, 0]).astype('int')
+    maxy_ref = np.max(nodes_ref[:, 1]).astype('int')
+    
+    minx_def = np.min(nodes_def[:, 0]).astype('int')
+    miny_def = np.min(nodes_def[:, 1]).astype('int')
+    maxx_def = np.max(nodes_def[:, 0]).astype('int')
+    maxy_def = np.max(nodes_def[:, 1]).astype('int')
+    
+    # Get ref and def images
+    ref_subset = ref_im[miny_ref:maxy_ref, minx_ref:maxx_ref]
+    def_subset = def_im[miny_def:maxy_def, minx_def:maxx_def]
+    
+    # Compute ZNSSD
+    znssd = analysis.discrete_znssd(ref_subset, def_subset)
+    
+    return znssd
+    
