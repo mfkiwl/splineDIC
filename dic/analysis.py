@@ -143,7 +143,7 @@ def parameterize_pixels(ref_image, ref_mesh):
             val = [j, i]  # [x, y]
 
             # Compute Euclidean distance between pixel coordinat and all computed ref mesh surf pts
-            diff = np.sqrt(np.sqaure(mesh_pts[:, 0] - val[0]) + np.square(mesh_pts[:, 1] - val[1]))
+            diff = np.sqrt(np.square(mesh_pts[:, 0] - val[0]) + np.square(mesh_pts[:, 1] - val[1]))
 
             # Get index value of minimum distance
             idx = np.where(diff == diff.min())[0]  # where returns a tuple, unpack
