@@ -109,11 +109,14 @@ def parameterize_pixels(ref_image, ref_mesh):
 	:type ref_image: ndarray
 	:param ref_mesh: Bspline surface mesh of on reference image
 	:type ref_mesh: Bspine surface object
-	:return: Array of pixel value and u, v parametric coordinate [Pixel X, Pixel Y, Pixel u, Pixel v]
+	:return: Array of u, v parametric coordinates saved at pixel coordinate [Pixel u, Pixel v]
 	:rtype: ndarray
 	"""
 
 	# Sanitize input
+
+	# Define a 3D array to contain u, v values
+	uv_vals = np.zeros((2,) + ref_image.shape)
 
 	# Get mesh control points
 	ref_cpts = np.array(ref_mesh.ctrlpts)
@@ -127,6 +130,38 @@ def parameterize_pixels(ref_image, ref_mesh):
 	rowmax = np.max(ref_cpts[:, 1])
 
 	# Precompute the mesh surface points at u,v values
+	mesh_pts = np.array(ref_mesh.evalpts)
+
+	# Get the eval delta from the surf
+	delta = surf.delta[0]
+
+	# Get divisor
+	divisor = 1 / delta
+	
+	# Loop through pixels
+	for i in range(rowmin, rowmax):
+		for j in range(colmin, colmax):
+			# Get pixel coordinate value
+			val = [j, i]  # [x, y]
+			
+			# Compute Euclidean distance between pixel coordinat and all computed ref mesh surf pts
+			diff = np.sqrt(np.sqaure(pts[:, 0] - val[0]) + np.square(pts[:, 1] - val[1]))
+			
+			# Get index value of minimum distance
+`			idx = np.where(diff == diff.min())[0]  # where returns a tuple, unpack
+			
+			# Get u value from divisor
+			u = delta * (idx // divisor)
+
+			# Get v value from remainder
+			v = delta * (idx % divisor)
+
+			# Add u,v values to array
+			uv_vals[0, i, j] = u
+			uv_vals[1, i, j] = v
+
+	return uv_vals
+				
 
 
 def mesh_znssd(ref_image, def_image, ref_cpts, cpts_disp, ref_coeff=None, def_coeff=None, interp_order='cubic'):
