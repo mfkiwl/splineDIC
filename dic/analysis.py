@@ -8,6 +8,9 @@
 
 from . import np
 from . import warnings
+from . import numerics
+from . import geomdl
+from geomdl import BSpline as bs
 
 
 def discrete_znssd(ref_image, def_image):
@@ -54,6 +57,83 @@ def discrete_znssd(ref_image, def_image):
             znssd += ((ref_image[i, j] - fm) / fstd - (def_image[i, j] - gm) / gstd) ** 2
 
     return znssd
+
+
+def mesh_znssd(ref_image, def_image, ref_cpts, cpts_disp, ref_coeff=None, def_coeff=None, interp_order='cubic'):
+    """
+    Compute the zero normalized sum of square differences over an entire mesh between two images
+    See Pan et al. Meas Sci Tech 2009 for details.
+
+    :param ref_image: reference image
+    :type ref_image: ndarray
+    :param def_image: deformed image
+    :type def_image: ndarray
+    :param ref_cpts: reference state control point positions. [X, Y]
+    :type ref_cpts: ndarray
+    :param cpts_disp: control point displacements [delta X, delta Y]
+    :type cpts_disp: ndarray
+    :param ref_coeff: 2D array of b-spline coefficients for reference image
+    :type ref_coeff: ndarray
+    :param def_coeff: 2D array of b-spline coefficients for deformed image
+    :type def_coeff: ndarray
+    :param interp_order: order of b-spline interpolation. Options: {'cubic', 'quintic'}
+    :type interp_order: str
+    :return: ZNSSD between the two images in the mesh region
+    :rtyp: float
+    """
+
+    # Sanitize input
+    if ref_image.ndim != 2:
+        raise ValueError('Reference image input must be 2d')
+
+    if def_image.ndim != 2:
+        raise ValueError('Deformed image input must be 2d')
+
+    if ref_coeff.any():
+        if not ref_coeff.shape == ref_image.shape:
+            raise ValueError('Coefficient array and image array must have same dimension (reference image)')
+    else:
+        ref_coeff = numerics.image_interp(ref_image, degree=interp_order)
+
+    if def_coeff.any():
+        if not def_coeff.shape == def_image.shape:
+            raise ValueError('Coefficient array and image array must have same dimension (deformed image)')
+    else:
+        def_coeff = numerics.image_interp(def_image, degree=interp_order)
+
+    if ref_image.shape != def_image.shape:
+        raise ValueError('Imags must be the same size')
+
+    # Get min and max column values from min/max reference ctrlpt node x values
+    colmin = np.min(ref_cpts[:, 0])
+    colmax = np.max(ref_cpts[:, 0])
+
+    # Get min and max row values from min/max reference ctrlpt node y values
+    rowmin = np.min(ref_cpts[:, 1])
+    rowmax = np.max(ref_cpts[:, 1])
+
+    # Set reference image mesh over image
+    f_mesh = ref_image[rowmin:rowmax, colmin: colmax]
+
+    # Compute mean of this reference image mesh
+    fmean = np.mean(f_mesh)
+
+    # Compute standard deviation this reference image mesh
+    fstddev = np.std(f_mesh)
+
+    # For every pixel in f, compute the new location in g
+    g_mesh = np.zeros(f_mesh.shape)
+
+    for i in range(rowmin, rowmax + 1):
+        for j in range(colmin, colmax + 1):
+            pass
+    # Compute the displacement by interpolating
+
+    # Compute mean of this deformed image mesh
+
+    # Compute standard deviation of this deformed image mesh
+
+    # Loop over these matrices and compute ZNSSD (could be much faster)
 
 
 def minfun(delta, nodes_ref, ref_im, def_im):
