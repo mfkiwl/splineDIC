@@ -10,8 +10,6 @@ from . import np
 from . import cv2
 
 
-
-# define affine warp function
 def im_warp(image, warp_mat):
     """
     Apply an affine warp to an image using OpenCV's affine warp function
