@@ -120,12 +120,12 @@ def parameterize_pixels(ref_image, ref_mesh):
     ref_cpts = np.array(ref_mesh.ctrlpts)
 
     # Get min and max column values from min/max reference ctrlpt node x values
-    colmin = np.min(ref_cpts[:, 0])
-    colmax = np.max(ref_cpts[:, 0])
+    colmin = np.min(ref_cpts[:, 0]).astype('int')
+    colmax = np.max(ref_cpts[:, 0]).astype('int')
 
     # Get min and max row values from min/max reference ctrlpt node y values
-    rowmin = np.min(ref_cpts[:, 1])
-    rowmax = np.max(ref_cpts[:, 1])
+    rowmin = np.min(ref_cpts[:, 1]).astype('int')
+    rowmax = np.max(ref_cpts[:, 1]).astype('int')
 
     # Precompute the mesh surface points at u,v values
     mesh_pts = np.array(ref_mesh.evalpts)
