@@ -203,7 +203,7 @@ def deform_mesh(ref_mesh, cpts_disp):
     return def_mesh
 
 
-def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, ref_coeff=None, def_coeff=None, interp_order='cubic'):
+def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, uv_vals, ref_coeff=None, def_coeff=None, interp_order='cubic'):
     """
     Compute the zero normalized sum of square differences over an entire mesh between two images
     See Pan et al. Meas Sci Tech 2009 for details.
@@ -251,6 +251,9 @@ def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, ref_coeff=None, def_co
     # Get ref mesh control points
     ref_cpts = np.array(ref_mesh.ctrlpts)
 
+    # Get def mesh 
+    def_mesh = deform_mesh(ref_mesh, ctps_disp)
+
     # Get min and max column values from min/max reference ctrlpt node x values
     colmin = np.min(ref_cpts[:, 0])
     colmax = np.max(ref_cpts[:, 0])
@@ -271,16 +274,30 @@ def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, ref_coeff=None, def_co
     # For every pixel in f, compute the new location in g
     g_mesh = np.zeros(f_mesh.shape)
 
-    for i in range(rowmin, rowmax + 1):
-        for j in range(colmin, colmax + 1):
-            pass
-    # Compute the displacement by interpolating
+    for i in range(rowmin, rowmax):
+        for j in range(colmin, colmax):
+            u_val = uv_vals[i, j, 0]
+            v_val = uv_vals[i, j, 1]
+
+            # Compute the displacement by interpolating
+            new_pt = def_mesh(u_val, v_val)
+
+            g_mesh[i, j] = numerics.eval_interp(new_pt[0], new_pt[1], def_image, coeffs=def_coeff, order=3)
 
     # Compute mean of this deformed image mesh
+    gmean = np.mean(g_mesh)
 
     # Compute standard deviation of this deformed image mesh
+    gstddev = np.std(g_mesh)
 
     # Loop over these matrices and compute ZNSSD (could be much faster)
+    znssd = 0.0
+
+    for i in range(rowmin, rowmax):
+        for j in range(colmin, colmax):
+            znssd += np.square((f_mesh[i, j] - fmean) / fstddev - (g_mesh[i, j] - gmean) / gstddev))
+
+    return znssd
 
 
 def minfun(delta, nodes_ref, ref_im, def_im):
