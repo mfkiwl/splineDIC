@@ -33,8 +33,6 @@ def normalize_2d(data_array):
     data_array *= 1/(data_max - data_min)  # Multiply by scaling term
 
 
-
-# Normalize 1D array
 def normalize_1d(data_array):
     
     """

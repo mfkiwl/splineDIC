@@ -103,19 +103,19 @@ def minfun(delta, nodes_ref, ref_im, def_im):
 def ratchet(maxdx, maxdy, nodes_ref, ref_image, def_image):
 
     """
-	Compute rigid deformation by ratcheting window over image
-	
-	:param maxdx: maximum step in x
-	:type maxdx: int
-	:param maxdy: maximum step in y
-	:type maxdy: int
-	:param ref_image: reference image array
-	:type ref_image: ndarray
-`	:param def_image: deformed image array
-	:type def_image: ndarray
-	:return: displacement [dx dy]
-	:rtype:ndarray
-	"""
+    Compute rigid deformation by ratcheting window over image
+
+    :param maxdx: maximum step in x
+    :type maxdx: int
+    :param maxdy: maximum step in y
+    :type maxdy: int
+    :param ref_image: reference image array
+    :type ref_image: ndarray
+    :param def_image: deformed image array
+    :type def_image: ndarray
+    :return: displacement [dx dy]
+    :rtype:ndarray
+    """
 
     minval = 1000
 
@@ -131,4 +131,5 @@ def ratchet(maxdx, maxdy, nodes_ref, ref_image, def_image):
                 return np.array([dx, dy, minval])
 
     warnings.warn('Could not find exact minimum value')
+
     return np.array([dx, dy, minval])
