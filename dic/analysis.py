@@ -295,7 +295,7 @@ def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, uv_vals, ref_coeff=Non
 
     for i in range(rowmin, rowmax):
         for j in range(colmin, colmax):
-            znssd += np.square((f_mesh[i, j] - fmean) / fstddev - (g_mesh[i, j] - gmean) / gstddev))
+            znssd += np.square((f_mesh[i, j] - fmean) / fstddev - (g_mesh[i, j] - gmean) / gstddev)
 
     return znssd
 
