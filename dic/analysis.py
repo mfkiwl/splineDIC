@@ -11,6 +11,7 @@ from . import warnings
 from . import numerics
 from . import geomdl
 from geomdl import BSpline as bs
+from geomdl import utilities as gutil
 
 
 def discrete_znssd(ref_image, def_image):
@@ -57,6 +58,75 @@ def discrete_znssd(ref_image, def_image):
             znssd += ((ref_image[i, j] - fm) / fstd - (def_image[i, j] - gm) / gstd) ** 2
 
     return znssd
+
+
+def mesh(ref_cpts, degree=3):
+
+	"""
+	Generate Bspline analysis mesh from set of control points
+
+	:param ref_cpts: N x 2 list of reference mesh control point positions
+	:type ref_cpts: ndarray
+	:param degree: Optional. Degree of B-spline curve
+	:typ degree: int
+	:return: B-spline surface with a uniform knot vector and specified control points and (optionally) degree
+	:rtype: Bspline surface object
+	"""
+
+	# Sanitize input
+	if ref_cpts.ndim !=2:
+		raise ValueError('Control points must have shape N x 2, with each row as [X Y]')
+	
+	# Get number of control points
+	num_ctrlpts = np.sqrt(len(ref_cpts)).astype('int')
+		
+	# Initialize surface
+	surf = bs.Surface()
+		
+	# Set degree
+	surf.degree_u = degree
+	surf.degree_v = degree
+
+	# Set control points
+	surf.set_ctrlpts(ref_cpts, num_ctrlpts, num_ctrlpts)
+
+	# Set knots
+	surf.knotvector_u = gutil.generate_knot_vector(surf.degree_u, num_ctrlpts)
+	surf.knotvector_v = gutil.generate_knot_vector(surf.degree_v, num_ctrlpts)
+
+	surf.delta = 0.001
+
+	return surf
+
+
+def parameterize_pixels(ref_image, ref_mesh):
+
+	"""
+	For each pixel in the reference image region of interest, compute the nearest u,v coordinate pair in the
+	spline mesh
+
+	:param ref_image: reference image
+	:type ref_image: ndarray
+	:param ref_mesh: Bspline surface mesh of on reference image
+	:type ref_mesh: Bspine surface object
+	:return: Array of pixel value and u, v parametric coordinate [Pixel X, Pixel Y, Pixel u, Pixel v]
+	:rtype: ndarray
+	"""
+
+	# Sanitize input
+
+	# Get mesh control points
+	ref_cpts = np.array(ref_mesh.ctrlpts)
+
+	# Get min and max column values from min/max reference ctrlpt node x values
+	colmin = np.min(ref_cpts[:, 0])
+	colmax = np.max(ref_cpts[:, 0])
+
+	# Get min and max row values from min/max reference ctrlpt node y values
+	rowmin = np.min(ref_cpts[:, 1])
+	rowmax = np.max(ref_cpts[:, 1])
+
+	# Precompute the mesh surface points at u,v values
 
 
 def mesh_znssd(ref_image, def_image, ref_cpts, cpts_disp, ref_coeff=None, def_coeff=None, interp_order='cubic'):
