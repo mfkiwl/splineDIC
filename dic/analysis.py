@@ -281,7 +281,7 @@ def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, uv_vals=None, ref_coef
 
     # If uv_vals haven't been precomputed via projection, set them as a linear mapping of pixel coord to [0, 1]
     if not uv_vals.any():
-        uv_vals = np.zeros((2,) + f_mesh.shape))
+        uv_vals = np.zeros((2,) + f_mesh.shape)
         for i in range(rowmin, rowmax):
             for j in range(colmin, colmax):
                 uv_vals[0, i, j] = (j - colmin) / (colmax - colmin)
