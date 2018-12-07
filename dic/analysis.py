@@ -61,151 +61,147 @@ def discrete_znssd(ref_image, def_image):
 
 
 def mesh(ref_cpts, degree=3):
+    """
+    Generate Bspline analysis mesh from set of control points
 
-	"""
-	Generate Bspline analysis mesh from set of control points
+    :param ref_cpts: N x 2 list of reference mesh control point positions
+    :type ref_cpts: ndarray
+    :param degree: Optional. Degree of B-spline curve
+    :typ degree: int
+    :return: B-spline surface with a uniform knot vector and specified control points and (optionally) degree
+    :rtype: Bspline surface object
+    """
 
-	:param ref_cpts: N x 2 list of reference mesh control point positions
-	:type ref_cpts: ndarray
-	:param degree: Optional. Degree of B-spline curve
-	:typ degree: int
-	:return: B-spline surface with a uniform knot vector and specified control points and (optionally) degree
-	:rtype: Bspline surface object
-	"""
+    # Sanitize input
+    if ref_cpts.ndim != 2:
+        raise ValueError('Control points must have shape N x 2, with each row as [X Y]')
 
-	# Sanitize input
-	if ref_cpts.ndim !=2:
-		raise ValueError('Control points must have shape N x 2, with each row as [X Y]')
-	
-	# Get number of control points
-	num_ctrlpts = np.sqrt(len(ref_cpts)).astype('int')
-		
-	# Initialize surface
-	surf = bs.Surface()
-		
-	# Set degree
-	surf.degree_u = degree
-	surf.degree_v = degree
+    # Get number of control points
+    num_ctrlpts = np.sqrt(len(ref_cpts)).astype('int')
 
-	# Set control points
-	surf.set_ctrlpts(ref_cpts, num_ctrlpts, num_ctrlpts)
+    # Initialize surface
+    surf = bs.Surface()
 
-	# Set knots
-	surf.knotvector_u = gutil.generate_knot_vector(surf.degree_u, num_ctrlpts)
-	surf.knotvector_v = gutil.generate_knot_vector(surf.degree_v, num_ctrlpts)
+    # Set degree
+    surf.degree_u = degree
+    surf.degree_v = degree
 
-	surf.delta = 0.001
+    # Set control points
+    surf.set_ctrlpts(ref_cpts, num_ctrlpts, num_ctrlpts)
 
-	return surf
+    # Set knots
+    surf.knotvector_u = gutil.generate_knot_vector(surf.degree_u, num_ctrlpts)
+    surf.knotvector_v = gutil.generate_knot_vector(surf.degree_v, num_ctrlpts)
+
+    surf.delta = 0.001
+
+    return surf
 
 
 def parameterize_pixels(ref_image, ref_mesh):
+    """
+    For each pixel in the reference image region of interest, compute the nearest u,v coordinate pair in the
+    spline mesh
 
-	"""
-	For each pixel in the reference image region of interest, compute the nearest u,v coordinate pair in the
-	spline mesh
+    :param ref_image: reference image
+    :type ref_image: ndarray
+    :param ref_mesh: Bspline surface mesh of on reference image
+    :type ref_mesh: Bspine surface object
+    :return: Array of u, v parametric coordinates saved at pixel coordinate [Pixel u, Pixel v]
+    :rtype: ndarray
+    """
 
-	:param ref_image: reference image
-	:type ref_image: ndarray
-	:param ref_mesh: Bspline surface mesh of on reference image
-	:type ref_mesh: Bspine surface object
-	:return: Array of u, v parametric coordinates saved at pixel coordinate [Pixel u, Pixel v]
-	:rtype: ndarray
-	"""
+    # Sanitize input
 
-	# Sanitize input
+    # Define a 3D array to contain u, v values
+    uv_vals = np.zeros((2,) + ref_image.shape)
 
-	# Define a 3D array to contain u, v values
-	uv_vals = np.zeros((2,) + ref_image.shape)
+    # Get mesh control points
+    ref_cpts = np.array(ref_mesh.ctrlpts)
 
-	# Get mesh control points
-	ref_cpts = np.array(ref_mesh.ctrlpts)
+    # Get min and max column values from min/max reference ctrlpt node x values
+    colmin = np.min(ref_cpts[:, 0])
+    colmax = np.max(ref_cpts[:, 0])
 
-	# Get min and max column values from min/max reference ctrlpt node x values
-	colmin = np.min(ref_cpts[:, 0])
-	colmax = np.max(ref_cpts[:, 0])
+    # Get min and max row values from min/max reference ctrlpt node y values
+    rowmin = np.min(ref_cpts[:, 1])
+    rowmax = np.max(ref_cpts[:, 1])
 
-	# Get min and max row values from min/max reference ctrlpt node y values
-	rowmin = np.min(ref_cpts[:, 1])
-	rowmax = np.max(ref_cpts[:, 1])
+    # Precompute the mesh surface points at u,v values
+    mesh_pts = np.array(ref_mesh.evalpts)
 
-	# Precompute the mesh surface points at u,v values
-	mesh_pts = np.array(ref_mesh.evalpts)
+    # Get the eval delta from the surf
+    delta = ref_mesh.delta[0]
 
-	# Get the eval delta from the surf
-	delta = surf.delta[0]
+    # Get divisor
+    divisor = 1 / delta
 
-	# Get divisor
-	divisor = 1 / delta
-	
-	# Loop through pixels
-	for i in range(rowmin, rowmax):
-		for j in range(colmin, colmax):
-			# Get pixel coordinate value
-			val = [j, i]  # [x, y]
-			
-			# Compute Euclidean distance between pixel coordinat and all computed ref mesh surf pts
-			diff = np.sqrt(np.sqaure(pts[:, 0] - val[0]) + np.square(pts[:, 1] - val[1]))
-			
-			# Get index value of minimum distance
-			idx = np.where(diff == diff.min())[0]  # where returns a tuple, unpack
-			
-			# Get u value from divisor
-			u = delta * (idx // divisor)
+    # Loop through pixels
+    for i in range(rowmin, rowmax):
+        for j in range(colmin, colmax):
+            # Get pixel coordinate value
+            val = [j, i]  # [x, y]
 
-			# Get v value from remainder
-			v = delta * (idx % divisor)
+            # Compute Euclidean distance between pixel coordinat and all computed ref mesh surf pts
+            diff = np.sqrt(np.sqaure(mesh_pts[:, 0] - val[0]) + np.square(mesh_pts[:, 1] - val[1]))
 
-			# Add u,v values to array
-			uv_vals[0, i, j] = u
-			uv_vals[1, i, j] = v
+            # Get index value of minimum distance
+            idx = np.where(diff == diff.min())[0]  # where returns a tuple, unpack
 
-	return uv_vals
+            # Get u value from divisor
+            u = delta * (idx // divisor)
+
+            # Get v value from remainder
+            v = delta * (idx % divisor)
+
+            # Add u,v values to array
+            uv_vals[0, i, j] = u
+            uv_vals[1, i, j] = v
+
+    return uv_vals
 
 
 def deform_mesh(ref_mesh, cpts_disp):
+    """
+    Produce a new B-spline surface mesh by adding a displacement to each control point of a reference mesh
+    :param ref_mesh: reference state B-spline mesh
+    :type ref_mesh: Bspline surface
+    :param cpts_disp: control point displacements [delta X, delta Y]
+    :type cpts_disp: ndarray
+    :return: deformed B-spline surface mesh
+    :rtype: Bspline surface
+    """
 
-	"""
-	Produce a new B-spline surface mesh by adding a displacement to each control point of a reference mesh
-	:param ref_mesh: reference state B-spline mesh
-	:type ref_mesh: Bspline surface
-	:param cpts_disp: control point displacements [delta X, delta Y]
-	:type cpts_disp: ndarray
-	:return: deformed B-spline surface mesh
-	:rtype: Bspline surface
-	"""
+    # Sanitize input
 
-	# Sanitize input
-	
-	# Get surface deformation info
-	degu = ref_mesh.degree_u
-	degv = ref_mesh.degree_v
+    # Get surface deformation info
+    degu = ref_mesh.degree_u
+    degv = ref_mesh.degree_v
 
-	knotvec_u = ref_mesh.knotvector_u
-	knotvec_v = ref_mesh.knotvector_v
-	
-	# Get control points of reference mesh
-	ref_ctrlpts = np.array(ref_mesh.ctrlpts)
+    knotvec_u = ref_mesh.knotvector_u
+    knotvec_v = ref_mesh.knotvector_v
 
-	num_ctrlpts = np.sqrt(len(ref_ctrlpts)).astype('int')
+    # Get control points of reference mesh
+    ref_ctrlpts = np.array(ref_mesh.ctrlpts)
 
-	# Deform control points
-	def_ctrlpts = np.column_stack((ref_ctrlpts[:, 0] + cpts_disp[:, 0], ref_ctrlpts[:, 1] + cpts_disp[:, 1]))
+    num_ctrlpts = np.sqrt(len(ref_ctrlpts)).astype('int')
 
-	# Create deformed mesh
-	def_mesh = bs.Surface()
+    # Deform control points
+    def_ctrlpts = np.column_stack((ref_ctrlpts[:, 0] + cpts_disp[:, 0], ref_ctrlpts[:, 1] + cpts_disp[:, 1]))
 
-	def_mesh.degree_u = degu
-	def_mesh.degree_v = degv
+    # Create deformed mesh
+    def_mesh = bs.Surface()
 
-	def_mesh.set_ctrlpts(def_ctrlpts, num_ctrlpts, num_ctrlps)
+    def_mesh.degree_u = degu
+    def_mesh.degree_v = degv
 
-	def_mesh.knotvector_u = knotvec_u
-	def_mesh.knotvector_v = knotvec_v
+    def_mesh.set_ctrlpts(def_ctrlpts, num_ctrlpts, num_ctrlps)
 
-	return def_mesh
+    def_mesh.knotvector_u = knotvec_u
+    def_mesh.knotvector_v = knotvec_v
 
-				
+    return def_mesh
+
 
 def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, ref_coeff=None, def_coeff=None, interp_order='cubic'):
     """
@@ -252,8 +248,8 @@ def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, ref_coeff=None, def_co
     if ref_image.shape != def_image.shape:
         raise ValueError('Imags must be the same size')
 
-	# Get ref mesh control points
-	ref_cpts = np.array(ref_mesh.ctrlpts)
+    # Get ref mesh control points
+    ref_cpts = np.array(ref_mesh.ctrlpts)
 
     # Get min and max column values from min/max reference ctrlpt node x values
     colmin = np.min(ref_cpts[:, 0])
@@ -332,7 +328,6 @@ def minfun(delta, nodes_ref, ref_im, def_im):
 
 
 def ratchet(maxdx, maxdy, nodes_ref, ref_image, def_image):
-
     """
     Compute rigid deformation by ratcheting window over image
 
