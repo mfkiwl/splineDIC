@@ -147,6 +147,7 @@ def parameterize_pixels(ref_image, ref_mesh):
 
             # Get index value of minimum distance
             idx = np.where(diff == diff.min())[0]  # where returns a tuple, unpack
+            idx = idx[0]  # Grab actual integer value from array
 
             # Get u value from divisor
             u = delta * (idx // divisor)
