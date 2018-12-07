@@ -98,6 +98,8 @@ def mesh(ref_cpts, degree=3):
     return surf
 
 
+
+# TODO: Rewrite this and just use projection and Newton's methods
 def parameterize_pixels(ref_image, ref_mesh):
     """
     For each pixel in the reference image region of interest, compute the nearest u,v coordinate pair in the
@@ -204,7 +206,7 @@ def deform_mesh(ref_mesh, cpts_disp):
     return def_mesh
 
 
-def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, uv_vals, ref_coeff=None, def_coeff=None, interp_order='cubic'):
+def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, uv_vals=None, ref_coeff=None, def_coeff=None, interp_order='cubic'):
     """
     Compute the zero normalized sum of square differences over an entire mesh between two images
     See Pan et al. Meas Sci Tech 2009 for details.
@@ -217,6 +219,8 @@ def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, uv_vals, ref_coeff=Non
     :type ref_mesh: Bspline surface
     :param cpts_disp: control point displacements [delta X, delta Y]
     :type cpts_disp: ndarray
+    :param uv_vals: Optional. Array containing u, v parameterization of the pixels in the reference image
+    :type uv_vals: ndarray
     :param ref_coeff: 2D array of b-spline coefficients for reference image
     :type ref_coeff: ndarray
     :param def_coeff: 2D array of b-spline coefficients for deformed image
@@ -275,10 +279,21 @@ def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, uv_vals, ref_coeff=Non
     # For every pixel in f, compute the new location in g
     g_mesh = np.zeros(f_mesh.shape)
 
+    # If uv_vals haven't been precomputed via projection, set them as a linear mapping of pixel coord to [0, 1]
+    if not uv_vals.any():
+        uv_vals = np.zeros((2,) + f_mesh.shape))
+        for i in range(rowmin, rowmax):
+            for j in range(colmin, colmax):
+                uv_vals[0, i, j] = (j - colmin) / (colmax - colmin)
+                uv_vals[1, i, j] = (i - rowmin) / (rowmax - rowmin)
+    else:
+        if not uv_vals.shape == ref_image.shape:
+            raise ValueError('u, v parameterization array must be same shape as reference image')
+
     for i in range(rowmin, rowmax):
         for j in range(colmin, colmax):
-            u_val = uv_vals[i, j, 0]
-            v_val = uv_vals[i, j, 1]
+            u_val = uv_vals[0, i, j]
+            v_val = uv_vals[1, i, j]
 
             # Compute the displacement by interpolating
             new_pt = def_mesh(u_val, v_val)
