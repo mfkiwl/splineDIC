@@ -161,10 +161,53 @@ def parameterize_pixels(ref_image, ref_mesh):
 			uv_vals[1, i, j] = v
 
 	return uv_vals
+
+
+def deform_mesh(ref_mesh, cpts_disp):
+
+	"""
+	Produce a new B-spline surface mesh by adding a displacement to each control point of a reference mesh
+	:param ref_mesh: reference state B-spline mesh
+	:type ref_mesh: Bspline surface
+	:param cpts_disp: control point displacements [delta X, delta Y]
+	:type cpts_disp: ndarray
+	:return: deformed B-spline surface mesh
+	:rtype: Bspline surface
+	"""
+
+	# Sanitize input
+	
+	# Get surface deformation info
+	degu = ref_mesh.degree_u
+	degv = ref_mesh.degree_v
+
+	knotvec_u = ref_mesh.knotvector_u
+	knotvec_v = ref_mesh.knotvector_v
+	
+	# Get control points of reference mesh
+	ref_ctrlpts = np.array(ref_mesh.ctrlpts)
+
+	num_ctrlpts = np.sqrt(len(ref_ctrlpts)).astype('int')
+
+	# Deform control points
+	def_ctrlpts = np.column_stack((ref_ctrlpts[:, 0] + cpts_disp[:, 0], ref_ctrlpts[:, 1] + cpts_disp[:, 1]))
+
+	# Create deformed mesh
+	def_mesh = bs.Surface()
+
+	def_mesh.degree_u = degu
+	def_mesh.degree_v = degv
+
+	def_mesh.set_ctrlpts(def_ctrlpts, num_ctrlpts, num_ctrlps)
+
+	def_mesh.knotvector_u = knotvec_u
+	def_mesh.knotvector_v = knotvec_v
+
+	return def_mesh
+
 				
 
-
-def mesh_znssd(ref_image, def_image, ref_cpts, cpts_disp, ref_coeff=None, def_coeff=None, interp_order='cubic'):
+def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, ref_coeff=None, def_coeff=None, interp_order='cubic'):
     """
     Compute the zero normalized sum of square differences over an entire mesh between two images
     See Pan et al. Meas Sci Tech 2009 for details.
@@ -173,8 +216,8 @@ def mesh_znssd(ref_image, def_image, ref_cpts, cpts_disp, ref_coeff=None, def_co
     :type ref_image: ndarray
     :param def_image: deformed image
     :type def_image: ndarray
-    :param ref_cpts: reference state control point positions. [X, Y]
-    :type ref_cpts: ndarray
+    :param ref_mesh: reference state B-spline mesh
+    :type ref_mesh: Bspline surface
     :param cpts_disp: control point displacements [delta X, delta Y]
     :type cpts_disp: ndarray
     :param ref_coeff: 2D array of b-spline coefficients for reference image
@@ -208,6 +251,9 @@ def mesh_znssd(ref_image, def_image, ref_cpts, cpts_disp, ref_coeff=None, def_co
 
     if ref_image.shape != def_image.shape:
         raise ValueError('Imags must be the same size')
+
+	# Get ref mesh control points
+	ref_cpts = np.array(ref_mesh.ctrlpts)
 
     # Get min and max column values from min/max reference ctrlpt node x values
     colmin = np.min(ref_cpts[:, 0])
