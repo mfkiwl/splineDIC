@@ -42,3 +42,55 @@ def image_interp(im_data, degree='cubic'):
 
     return coefficients
 
+
+def eval_interp(x, y, image, coeffs=None, order=3):
+    """
+    Evaluate an image at a non-integer location.
+
+    Allows a user to pass a set of precomputed coeffiecients or let the function perform the interpolation in place
+
+    X is columns
+    Y is rows
+
+    :param x: x coordinate of interpolation location
+    :type x: float
+    :param y: y coordinate of interpolation location
+    :type y: float
+    :param coeffs: Optional. 2D array of b spline interpolation coefficients
+    :type coeffs: ndarray
+    :param order: Optional. Order of spline interpolation and evaluation
+    :type order: int
+    :return: interpolated value as location [x, y]
+    :rtype: float
+    """
+
+    # Alias name
+    bspline = signal.bspline
+
+    # Sanitize input
+    # Not quite duck typing, but it's very important that the b-spline function recieves floats, not ints as arguments
+    if not isinstance(x, float):
+        raise TypeError('x coordinate must be a float')
+
+    if not isinstance(y, float):
+        raise TypeError('y coordinate must be a float')
+
+    if image.ndim != 2:
+        raise ValueError('Image must be 2D array')
+
+    if coeffs.any():
+        if not coeffs.shape == image.shape:
+            raise ValueError('Coefficient array and Image array must have the same dimension')
+    else:
+        coeffs = image_interp(image, degree=order)
+
+    # Get the row and column start index based on x, y
+    colindex = np.ceil(x - (order + 1) / 2).astype('int')  # Cast to int
+    rowindex = np.ceil(y - (order + 1) / 2).astype('int')  # Cast to int
+
+    val = 0.0
+    for k in range(rowindex, rowindex + order + 1):  # Adding one to account for range
+        for l in range(colindex, colindex + order + 1):
+            val += coeffs[k, l] * bspline(y - k, order) * bspline(x - l, order)
+
+    return val
