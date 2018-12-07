@@ -148,7 +148,7 @@ def parameterize_pixels(ref_image, ref_mesh):
 			diff = np.sqrt(np.sqaure(pts[:, 0] - val[0]) + np.square(pts[:, 1] - val[1]))
 			
 			# Get index value of minimum distance
-`			idx = np.where(diff == diff.min())[0]  # where returns a tuple, unpack
+			idx = np.where(diff == diff.min())[0]  # where returns a tuple, unpack
 			
 			# Get u value from divisor
 			u = delta * (idx // divisor)
