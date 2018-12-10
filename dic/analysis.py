@@ -198,7 +198,7 @@ def deform_mesh(ref_mesh, cpts_disp):
     def_mesh.degree_u = degu
     def_mesh.degree_v = degv
 
-    def_mesh.set_ctrlpts(def_ctrlpts, num_ctrlpts, num_ctrlpts)
+    def_mesh.set_ctrlpts(def_ctrlpts.tolist(), num_ctrlpts, num_ctrlpts)
 
     def_mesh.knotvector_u = knotvec_u
     def_mesh.knotvector_v = knotvec_v
