@@ -265,7 +265,7 @@ def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, uv_vals=None, ref_coef
 
     # Get min and max row values from min/max reference ctrlpt node y values
     rowmin = np.min(ref_cpts[:, 1]).astype('int')
-    rowmax = np.max(ref_cpts[:, 1]).asytpe('int')
+    rowmax = np.max(ref_cpts[:, 1]).astype('int')
 
     # Set reference image mesh over image
     f_mesh = ref_image[rowmin:rowmax, colmin: colmax]
@@ -280,7 +280,7 @@ def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, uv_vals=None, ref_coef
     g_mesh = np.zeros(f_mesh.shape)
 
     # If uv_vals haven't been precomputed via projection, set them as a linear mapping of pixel coord to [0, 1]
-    if not uv_vals.any():
+    if not uv_vals is None:
         uv_vals = np.zeros((2,) + f_mesh.shape)
         for i in range(rowmin, rowmax):
             for j in range(colmin, colmax):
