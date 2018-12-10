@@ -257,7 +257,7 @@ def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, uv_vals=None, ref_coef
     ref_cpts = np.array(ref_mesh.ctrlpts)
 
     # Get def mesh 
-    def_mesh = deform_mesh(ref_mesh, ctps_disp)
+    def_mesh = deform_mesh(ref_mesh, cpts_disp)
 
     # Get min and max column values from min/max reference ctrlpt node x values
     colmin = np.min(ref_cpts[:, 0])
