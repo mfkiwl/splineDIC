@@ -251,7 +251,7 @@ def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, uv_vals=None, ref_coef
         def_coeff = numerics.image_interp(def_image, degree=interp_order)
 
     if ref_image.shape != def_image.shape:
-        raise ValueError('Imags must be the same size')
+        raise ValueError('Images must be the same size')
 
     # Get ref mesh control points
     ref_cpts = np.array(ref_mesh.ctrlpts)
@@ -260,13 +260,21 @@ def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, uv_vals=None, ref_coef
     def_mesh = deform_mesh(ref_mesh, cpts_disp)
 
     # Get min and max column values from min/max reference ctrlpt node x values
+    min_col_index = np.min(ref_cpts[:, 0]).astype('int')
+    max_col_index = np.max(ref_cpts[:, 0]).astype('int')
+
+    # Get maximum column number for sub image array from ref ctrlpt node x values
     colmax = (np.max(ref_cpts[:, 0]) - np.min(ref_cpts[:, 0])).astype('int')
+
+    # Get min and max column values from min/max reference ctrlpt node x values
+    min_row_index = np.min(ref_cpts[:, 1]).astype('int')
+    max_row_index = np.max(ref_cpts[:, 1]).astype('int')
 
     # Get min and max row values from min/max reference ctrlpt node y values
     rowmax = (np.max(ref_cpts[:, 1]) - np.min(ref_cpts[:, 1])).astype('int')
 
     # Set reference image mesh over image
-    f_mesh = ref_image[0:rowmax, 0:colmax]
+    f_mesh = ref_image[min_row_index:max_row_index, min_col_index:max_col_index]
 
     # Compute mean of this reference image mesh
     fmean = np.mean(f_mesh)
