@@ -294,7 +294,7 @@ def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, uv_vals=None, ref_coef
             v_val = uv_vals[1, i, j]
 
             # Compute the displacement by interpolating
-            new_pt = def_mesh(u_val, v_val)
+            new_pt = def_mesh.surfpt(u_val, v_val)
 
             g_mesh[i, j] = numerics.eval_interp(new_pt[0], new_pt[1], def_image, coeffs=def_coeff, order=3)
 
