@@ -122,7 +122,7 @@ def parameterize_pixels(ref_image, ref_mesh):
     ref_cpts = np.array(ref_mesh.ctrlpts)
 
     # Get min and max column values from min/max reference ctrlpt node x values
-    colmin = np.min(ref_cpts[:, 0]).astype('int')
+    0 = np.min(ref_cpts[:, 0]).astype('int')
     colmax = np.max(ref_cpts[:, 0]).astype('int')
 
     # Get min and max row values from min/max reference ctrlpt node y values
@@ -140,7 +140,7 @@ def parameterize_pixels(ref_image, ref_mesh):
 
     # Loop through pixels
     for i in range(rowmin, rowmax):
-        for j in range(colmin, colmax):
+        for j in range(0, colmax):
             # Get pixel coordinate value
             val = [j, i]  # [x, y]
 
@@ -260,15 +260,13 @@ def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, uv_vals=None, ref_coef
     def_mesh = deform_mesh(ref_mesh, cpts_disp)
 
     # Get min and max column values from min/max reference ctrlpt node x values
-    colmin = np.min(ref_cpts[:, 0]).astype('int')
-    colmax = np.max(ref_cpts[:, 0]).astype('int')
+    colmax = (np.max(ref_cpts[:, 0]) - np.min(ref_cpts[:, 0])).astype('int')
 
     # Get min and max row values from min/max reference ctrlpt node y values
-    rowmin = np.min(ref_cpts[:, 1]).astype('int')
-    rowmax = np.max(ref_cpts[:, 1]).astype('int')
+    rowmax = (np.max(ref_cpts[:, 1]) - np.min(ref_cpts[:, 1])).astype('int')
 
     # Set reference image mesh over image
-    f_mesh = ref_image[rowmin:rowmax, colmin: colmax]
+    f_mesh = ref_image[0:rowmax, 0:colmax]
 
     # Compute mean of this reference image mesh
     fmean = np.mean(f_mesh)
@@ -282,16 +280,16 @@ def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, uv_vals=None, ref_coef
     # If uv_vals haven't been precomputed via projection, set them as a linear mapping of pixel coord to [0, 1]
     if uv_vals is None:
         uv_vals = np.zeros((2,) + f_mesh.shape)
-        for i in range(rowmin, rowmax):
-            for j in range(colmin, colmax):
-                uv_vals[0, i, j] = (j - colmin) / (colmax - colmin)
-                uv_vals[1, i, j] = (i - rowmin) / (rowmax - rowmin)
+        for i in range(0, rowmax):
+            for j in range(0, colmax):
+                uv_vals[0, i, j] = j / colmax
+                uv_vals[1, i, j] = i / rowmax
     else:
         if not uv_vals.shape == ref_image.shape:
             raise ValueError('u, v parameterization array must be same shape as reference image')
 
-    for i in range(rowmin, rowmax):
-        for j in range(colmin, colmax):
+    for i in range(0, rowmax):
+        for j in range(0, colmax):
             u_val = uv_vals[0, i, j]
             v_val = uv_vals[1, i, j]
 
@@ -309,8 +307,8 @@ def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, uv_vals=None, ref_coef
     # Loop over these matrices and compute ZNSSD (could be much faster)
     znssd = 0.0
 
-    for i in range(rowmin, rowmax):
-        for j in range(colmin, colmax):
+    for i in range(0, rowmax):
+        for j in range(0, colmax):
             znssd += np.square((f_mesh[i, j] - fmean) / fstddev - (g_mesh[i, j] - gmean) / gstddev)
 
     return znssd
