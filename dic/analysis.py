@@ -122,7 +122,7 @@ def parameterize_pixels(ref_image, ref_mesh):
     ref_cpts = np.array(ref_mesh.ctrlpts)
 
     # Get min and max column values from min/max reference ctrlpt node x values
-    0 = np.min(ref_cpts[:, 0]).astype('int')
+    colmin = np.min(ref_cpts[:, 0]).astype('int')
     colmax = np.max(ref_cpts[:, 0]).astype('int')
 
     # Get min and max row values from min/max reference ctrlpt node y values
@@ -140,7 +140,7 @@ def parameterize_pixels(ref_image, ref_mesh):
 
     # Loop through pixels
     for i in range(rowmin, rowmax):
-        for j in range(0, colmax):
+        for j in range(colmin, colmax):
             # Get pixel coordinate value
             val = [j, i]  # [x, y]
 
