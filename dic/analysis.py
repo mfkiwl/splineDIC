@@ -239,7 +239,7 @@ def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, uv_vals=None, ref_coef
         raise ValueError('Deformed image input must be 2d')
     
     # Check if reference image interpolation coefficents have been set
-    if not ref_coeff.size is None:
+    if not ref_coeff is None:
         if not ref_coeff.shape == ref_image.shape:
             raise ValueError('Coefficient array and image array must have same dimension (reference image)')
     else:
