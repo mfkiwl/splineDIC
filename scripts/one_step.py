@@ -36,8 +36,8 @@ pr.disable()
 # Hard code absolute paths for now. Fix later'
 dic_name = 'C:\\Users\\potterst1\\Desktop\\Repositories\\BitBucket\\dic\\data\\DIC_S_cropped_gray_pad_0.tiff'
 psfdi_name = 'C:\\Users\\potterst1\\Desktop\\Repositories\\BitBucket\\dic\\data\\DOA_cropped_gray_pad_0.tiff'
-# dic_name = '/workspace/stpotter/git/bitbucket/dic/data/DIC_S_cropped_gray_pad_0.tiff'
-# psfdi_name = '/workspace/stpotter/git/bitbucket/dic/data/DOSA_cropped_gray_pad_0.tiff'
+dic_name = '/workspace/stpotter/git/bitbucket/dic/data/DIC_S_cropped_gray_pad_0.tiff'
+psfdi_name = '/workspace/stpotter/git/bitbucket/dic/data/DOSA_cropped_gray_pad_0.tiff'
 ref_image = cv2.imread(dic_name, -1)  # Read in image 'as is'
 ref_image = ref_image.astype('uint8')
 
@@ -76,7 +76,7 @@ ref_surf.set_ctrlpts(coords.tolist(), num_ctrlpts, num_ctrlpts)
 ref_surf.knotvector_u = gutil.generate_knot_vector(ref_surf.degree_u, num_ctrlpts)
 ref_surf.knotvector_v = gutil.generate_knot_vector(ref_surf.degree_v, num_ctrlpts)
 
-ref_surf.delta = 0.001
+ref_surf.delta = 0.01
 
 arg_tup = (ref_image, def_image, ref_surf)
 
