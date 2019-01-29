@@ -81,7 +81,7 @@ ref_surf.delta = 0.01
 arg_tup = (ref_image, def_image, ref_surf)
 
 # Setup initial displacement vector
-int_disp_vec = np.zeros(len(coords))
+int_disp_vec = np.zeros((len(coords), 2))
 for i in range(0, len(int_disp_vec)):
     int_disp_vec[i, 0] = 5.0
     int_disp_vec[i, 1] = 0.0
