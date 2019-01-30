@@ -111,9 +111,8 @@ for i in range(0, len(int_disp_vec), 2):
     int_disp_vec[i] = 5.0
     int_disp_vec[i+1] = 0.0
 
-print('Ive called the minfun')
+print('Begin minimization')
 pr.enable()
-result = minfun_nm(int_disp_vec, *arg_tup)
+sciopt.minimize(minfun_nm, int_disp_vec, args=arg_tup, method='Nelder-Mead')
 pr.disable()
-pr.dump_stats('minfun.pstat')
-print(result)
+pr.dump_stats('opt.pstat')
