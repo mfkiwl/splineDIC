@@ -121,7 +121,7 @@ def_norm = def_image - def_image.mean()
 
 # Correlate
 corr = sig.correlate2d(def_norm, ref_subnorm, boundary='symm', mode='same')
-midy, midx = np.unravel_index(np.argmax(corr), coor.shape)
+midy, midx = np.unravel_index(np.argmax(corr), corr.shape)
 
 initx = (midx + 1) - colmid
 inity = (midy + 1) - rowmid
@@ -136,7 +136,7 @@ for i in range(0, len(int_disp_vec), 2):
 
 pr.enable()
 
-residual = minfun_nm(int_disp_vec, arg_tup)
+residual = minfun_nm(int_disp_vec, *arg_tup)
 
 if residual > 1e-6:
     print('Begin minimization')
