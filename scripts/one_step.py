@@ -41,9 +41,11 @@ psfdi_name = '/workspace/stpotter/git/bitbucket/dic/data/DOSA_cropped_gray_pad_0
 ref_image = cv2.imread(dic_name, -1)  # Read in image 'as is'
 ref_image = ref_image.astype('uint8')
 
-# Translate image in x
-transx = np.array([[1.0, 0.0, 5.0],
-                   [0.0, 1.0, 0.0]])
+# Translate image
+dx = 5.0
+dy = 0.0
+transx = np.array([[1.0, 0.0, dx],
+                   [0.0, 1.0, dy]])
 def_image = image_processing.im_warp(ref_image, transx)
 
 # Format: [column index for start of X, column index for end of X, row index for start of Y, row index for end of Y]
@@ -108,11 +110,14 @@ def minfun_nm(disp_vec, *args):
 # Setup initial displacement vector
 int_disp_vec = np.zeros(2*len(coords))
 for i in range(0, len(int_disp_vec), 2):
-    int_disp_vec[i] = 5.0
+    int_disp_vec[i] = 4.0
     int_disp_vec[i+1] = 0.0
 
-print('Initial X Displacement: {}'.format(int_disp_vec[0]))
-print('Initial Y Displacement: {}'.format(int_disp_vec[1]))
+print('Actual Rigid X Displacement: {}'.format(dx))
+print('Actual Rigid Y Displacement: {}'.format(dy))
+print('Mesh Details: {} by {}'.format(num_ctrlpts, num_ctrlpts))
+print('Initial Guess -  X Displacement: {}'.format(int_disp_vec[0]))
+print('Initial Guess - Y Displacement: {}'.format(int_disp_vec[1]))
 print('Begin minimization')
 pr.enable()
 result = sciopt.minimize(minfun_nm, int_disp_vec, args=arg_tup, method='Nelder-Mead', options={'maxiter': 10, 'disp': True})
@@ -122,3 +127,4 @@ print('final control point displacements')
 print(result.x)
 pr.disable()
 pr.dump_stats('opt.pstat')
+print('execution time (s)')
