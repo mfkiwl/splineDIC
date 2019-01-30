@@ -25,6 +25,7 @@ import numpy as np
 from geomdl import BSpline as bs
 from geomdl import utilities as gutil
 import scipy.optimize as sciopt
+import scipy.signal as sig
 
 # Debugging
 import cProfile as profile
@@ -107,24 +108,60 @@ def minfun_nm(disp_vec, *args):
 
     return znssd
 
+# Compute rigid initial correlation with 2d correlation
+rowmid = int(np.mean([rowmin, rowmax]))
+colmid = int(np.mean([colmin, colmax]))
+
+# Get subimage
+subimage = np.copy(ref_image[subregion_indices[2]:subregion_indices[3], subregion_indices[0]:subregion_indices[1]])
+
+# Normalize images
+ref_subnorm = subimage - subimage.mean()
+def_norm = def_image - def_image.mean()
+
+# Correlate
+corr = sig.correlate2d(def_norm, ref_subnorm, boundary='symm', mode='same')
+midy, midx = np.unravel_index(np.argmax(corr), coor.shape)
+
+initx = (midx + 1) - colmid
+inity = (midy + 1) - rowmid
+
 # Setup initial displacement vector
 int_disp_vec = np.zeros(2*len(coords))
 for i in range(0, len(int_disp_vec), 2):
-    int_disp_vec[i] = 5.0
-    int_disp_vec[i+1] = 0.0
+    int_disp_vec[i] = initx
+    int_disp_vec[i+1] = inity
+
+# compute mesh znssd one time and exit if its low enough
+
+pr.enable()
+
+residual = minfun_nm(int_disp_vec, arg_tup)
+
+if residual < 1e-6:
+    continue
+else:
+    print('Begin minimization')
+    result = sciopt.minimize(minfun_nm, int_disp_vec, args=arg_tup, method='Nelder-Mead', options={'maxiter': 10, 'disp': True})
 
 print('Actual Rigid X Displacement: {}'.format(dx))
 print('Actual Rigid Y Displacement: {}'.format(dy))
 print('Mesh Details: {} by {}'.format(num_ctrlpts, num_ctrlpts))
-print('Initial Guess -  X Displacement: {}'.format(int_disp_vec[0]))
-print('Initial Guess - Y Displacement: {}'.format(int_disp_vec[1]))
-print('Begin minimization')
-pr.enable()
-result = sciopt.minimize(minfun_nm, int_disp_vec, args=arg_tup, method='Nelder-Mead', options={'maxiter': 10, 'disp': True})
-print('residual')
-print(result.fun)
-print('final control point displacements')
-print(result.x)
+print('Initial Guess -  X Displacement: {}'.format(initx))
+print('Initial Guess - Y Displacement: {}'.format(inity))
+
+if residual < 1e-6:
+    print('residual')
+    print(residual)
+    print('final control point displacement')
+    print(int_disp_vec)A
+else:
+    print('residual')
+    print(result.fun)
+    print('final control point displacements')
+    print(result.x)
+
 pr.disable()
 pr.dump_stats('opt.pstat')
 print('execution time (s)')
+
