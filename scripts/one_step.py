@@ -138,9 +138,7 @@ pr.enable()
 
 residual = minfun_nm(int_disp_vec, arg_tup)
 
-if residual < 1e-6:
-    continue
-else:
+if residual > 1e-6:
     print('Begin minimization')
     result = sciopt.minimize(minfun_nm, int_disp_vec, args=arg_tup, method='Nelder-Mead', options={'maxiter': 10, 'disp': True})
 
@@ -150,16 +148,16 @@ print('Mesh Details: {} by {}'.format(num_ctrlpts, num_ctrlpts))
 print('Initial Guess -  X Displacement: {}'.format(initx))
 print('Initial Guess - Y Displacement: {}'.format(inity))
 
-if residual < 1e-6:
-    print('residual')
-    print(residual)
-    print('final control point displacement')
-    print(int_disp_vec)A
-else:
+if residual > 1e-6:
     print('residual')
     print(result.fun)
     print('final control point displacements')
     print(result.x)
+else:
+    print('residual')
+    print(residual)
+    print('final control point displacement')
+    print(int_disp_vec)
 
 pr.disable()
 pr.dump_stats('opt.pstat')
