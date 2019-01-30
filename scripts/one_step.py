@@ -111,8 +111,8 @@ for i in range(0, len(int_disp_vec), 2):
     int_disp_vec[i] = 5.0
     int_disp_vec[i+1] = 0.0
 
-print('Initial X Displacement: {}'.format(int_disp_vec[0])
-print('Initial Y Displacement: {}'.format(int_disp_vec[1])
+print('Initial X Displacement: {}'.format(int_disp_vec[0]))
+print('Initial Y Displacement: {}'.format(int_disp_vec[1]))
 print('Begin minimization')
 pr.enable()
 result = sciopt.minimize(minfun_nm, int_disp_vec, args=arg_tup, method='Nelder-Mead', options={'maxiter': 10, 'disp': True})
