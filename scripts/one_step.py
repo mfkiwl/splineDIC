@@ -108,11 +108,12 @@ def minfun_nm(disp_vec, *args):
 # Setup initial displacement vector
 int_disp_vec = np.zeros(2*len(coords))
 for i in range(0, len(int_disp_vec), 2):
-    int_disp_vec[i] = 5.0
+    int_disp_vec[i] = 4.0
     int_disp_vec[i+1] = 0.0
 
 print('Begin minimization')
 pr.enable()
-sciopt.minimize(minfun_nm, int_disp_vec, args=arg_tup, method='Nelder-Mead')
+result = sciopt.minimize(minfun_nm, int_disp_vec, args=arg_tup, method='Nelder-Mead', options={'maxiter': 10, 'disp': True})
+print(result.x)
 pr.disable()
 pr.dump_stats('opt.pstat')
