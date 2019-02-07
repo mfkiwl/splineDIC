@@ -35,7 +35,7 @@ def image_interp(im_data, degree='cubic'):
     if degree == 'cubic':
         coefficients = signal.cspline2d(im_data)  # Leaving out an additional input options for smoothing for now
     elif degree == 'quintic':
-        pass
+        print('Qunitic functionality not yet implemented')
     else:
         print('Invalid interpolation degree specified! Options are either cubic or quintic')
         return None
