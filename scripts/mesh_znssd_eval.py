@@ -86,7 +86,6 @@ for i in range(0, len(int_disp_vec)):
     int_disp_vec[i, 0] = 5.0
     int_disp_vec[i, 1] = 0.0
 
-print('Ive called the mesh_znssd')
 print('Mesh Details: {} by {}'.format(num_ctrlpts, num_ctrlpts))
 print('ROI Size: {} by {}'.format(rowmax-rowmin, colmax - colmin))
 pr.enable()
@@ -94,3 +93,4 @@ result = analysis.mesh_znssd(ref_image, def_image, ref_surf, int_disp_vec)
 pr.disable()
 pr.dump_stats('mesh_znssd.pstat')
 print(result)
+print('Execution time:')
