@@ -43,10 +43,14 @@ ref_image = cv2.imread(dic_name, -1)  # Read in image 'as is'
 ref_image = ref_image.astype('uint8')
 
 # Translate image
-dx = 5.0
+dx = 0.0
 dy = 0.0
-transx = np.array([[1.0, 0.0, dx],
-                   [0.0, 1.0, dy]])
+F11 = 1.01
+F12 = 0.0
+F21 = 0.0
+F22 = 1.0
+transx = np.array([[F11, F12, dx],
+                   [F21, F22, dy]])
 def_image = image_processing.im_warp(ref_image, transx)
 
 # Format: [column index for start of X, column index for end of X, row index for start of Y, row index for end of Y]
@@ -140,7 +144,7 @@ residual = minfun_nm(int_disp_vec, *arg_tup)
 
 if residual > 1e-6:
     print('Begin minimization')
-    result = sciopt.minimize(minfun_nm, int_disp_vec, args=arg_tup, method='Nelder-Mead', options={'maxiter': 10, 'disp': True})
+    result = sciopt.minimize(minfun_nm, int_disp_vec, args=arg_tup, method='L-BFGS-B', jac='2-point', bounds=None, options={'maxiter': 10, 'disp': True})
 
 print('Actual Rigid X Displacement: {}'.format(dx))
 print('Actual Rigid Y Displacement: {}'.format(dy))
