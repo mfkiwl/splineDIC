@@ -89,10 +89,14 @@ def eval_interp(x, y, image, coeffs=None, order=3):
         # Alias function
         cubic = signal.cubic
 
-        val = 0.0
-        for k in range(rowindex, rowindex + order + 1):  # Adding one to account for range
-            for l in range(colindex, colindex + order + 1):
-                val += coeffs[k, l] * cubic(y - k) * cubic(x - l)
+        cols = np.array(range(colindex, colindex + order + 1))
+        rows = np.array(range(rowindex, rowindex + order + 1))
+        argx = x - cols
+        argy = y - rows
+        splinex = cubic(argx)
+        spliney = cubic(argy)
+        val = np.linalg.multi_dot((spliney, coeffs[rowindex: rowindex + order + 1, colindex: colindex + order + 1], splinex))
+
     else:
         # Alias function
         bspline = signal.bspline
