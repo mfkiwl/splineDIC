@@ -64,9 +64,6 @@ def eval_interp(x, y, image, coeffs=None, order=3):
     :rtype: float
     """
 
-    # Alias name
-    bspline = signal.bspline
-
     # Sanitize input
     # Not quite duck typing, but it's very important that the b-spline function recieves floats, not ints as arguments
     if not isinstance(x, float):
@@ -88,9 +85,21 @@ def eval_interp(x, y, image, coeffs=None, order=3):
     colindex = np.ceil(x - (order + 1) / 2).astype('int')  # Cast to int
     rowindex = np.ceil(y - (order + 1) / 2).astype('int')  # Cast to int
 
-    val = 0.0
-    for k in range(rowindex, rowindex + order + 1):  # Adding one to account for range
-        for l in range(colindex, colindex + order + 1):
-            val += coeffs[k, l] * bspline(y - k, order) * bspline(x - l, order)
+    if order == 3:
+        # Alias function
+        cubic = signal.cubic
+
+        val = 0.0
+            for k in range(rowindex, rowindex + order + 1):  # Adding one to account for range
+                for l in range(colindex, colindex + order + 1):
+                    val += coeffs[k, l] * cubic(y - k) * cubic(x - l)
+    else:
+        # Alias function
+        bspline = signal.bspline
+
+        val = 0.0
+        for k in range(rowindex, rowindex + order + 1):  # Adding one to account for range
+            for l in range(colindex, colindex + order + 1):
+                val += coeffs[k, l] * bspline(y - k, order) * bspline(x - l, order)
 
     return val
