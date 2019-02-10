@@ -90,9 +90,9 @@ def eval_interp(x, y, image, coeffs=None, order=3):
         cubic = signal.cubic
 
         val = 0.0
-            for k in range(rowindex, rowindex + order + 1):  # Adding one to account for range
-                for l in range(colindex, colindex + order + 1):
-                    val += coeffs[k, l] * cubic(y - k) * cubic(x - l)
+        for k in range(rowindex, rowindex + order + 1):  # Adding one to account for range
+            for l in range(colindex, colindex + order + 1):
+                val += coeffs[k, l] * cubic(y - k) * cubic(x - l)
     else:
         # Alias function
         bspline = signal.bspline
