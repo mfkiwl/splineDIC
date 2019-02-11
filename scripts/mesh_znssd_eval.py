@@ -47,7 +47,7 @@ transx = np.array([[1.0, 0.0, 5.0],
 def_image = image_processing.im_warp(ref_image, transx)
 
 # Format: [column index for start of X, column index for end of X, row index for start of Y, row index for end of Y]
-subregion_indices = np.array([225, 275, 225, 275])
+subregion_indices = np.array([125, 375, 125, 375])
 
 # Control Points
 rowmin = subregion_indices[-2:].min()
