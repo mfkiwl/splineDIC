@@ -152,11 +152,11 @@ residual = minfun_nm(int_disp_vec, *arg_tup)
 if residual > 1e-6:
     print('Begin minimization')
 	if method == 'L-BFGS-B':
-		result = sciopt.minimize(minfun_nm, int_disp_vec, args=arg_tup, method='L-BFGS-B', jac='2-point', bounds=None, options={'disp': True})
-	elif method == 'Nelder-Mead'
-		result = sciopt.minimize(minfun_nm, int_disp_vec, args=arg_tup, method='Nelder-Mead', options={'disp': True})
+        result = sciopt.minimize(minfun_nm, int_disp_vec, args=arg_tup, method='L-BFGS-B', jac='2-point', bounds=None, options={'disp': True})
+	elif method == 'Nelder-Mead':
+        result = sciopt.minimize(minfun_nm, int_disp_vec, args=arg_tup, method='Nelder-Mead', options={'disp': True})
 	else:
-		result = sciopt.minimize(minfun_nm, int_disp_vec, args=arg_tup, method='BFGS', jac='2-point', options={'disp': True})
+        result = sciopt.minimize(minfun_nm, int_disp_vec, args=arg_tup, method='BFGS', jac='2-point', options={'disp': True})
 
 print('Actual Rigid X Displacement: {}'.format(dx))
 print('Actual Rigid Y Displacement: {}'.format(dy))
