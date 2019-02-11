@@ -37,5 +37,5 @@ def im_warp(image, warp_mat):
     
     # Warp the image and require the output to be the same size as input
     warped_im = cv2.warpAffine(image, warp_mat, (cols, rows), flags=cv2.INTER_CUBIC)
-    
+
     return warped_im
