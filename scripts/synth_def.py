@@ -158,9 +158,11 @@ if residual > 1e-6:
     else:
         result = sciopt.minimize(minfun_nm, int_disp_vec, args=arg_tup, method='BFGS', jac='2-point', options={'disp': True})
 
-print('Actual Rigid X Displacement: {}'.format(dx))
-print('Actual Rigid Y Displacement: {}'.format(dy))
+print('Prescribed Rigid X Displacement: {}'.format(dx))
+print('Prescribed Rigid Y Displacement: {}'.format(dy))
+print('Prescribed F11 F12 F21 F22: {} {} {} {}'.format(F11, F12, F21, F22))
 print('Mesh Details: {} by {}'.format(num_ctrlpts, num_ctrlpts))
+print('ROI Size: {} by {}'.format(rowmax-rowmin, colmax - colmin))
 print('Initial Guess -  X Displacement: {}'.format(initx))
 print('Initial Guess - Y Displacement: {}'.format(inity))
 
