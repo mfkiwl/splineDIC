@@ -48,17 +48,24 @@ except:
 
 # Read
 # Hard code absolute paths for now. Fix later'
-dic_name = 'C:\\Users\\potterst1\\Desktop\\Repositories\\BitBucket\\dic\\data\\DIC_S_cropped_gray_pad_0.tiff'
-psfdi_name = 'C:\\Users\\potterst1\\Desktop\\Repositories\\BitBucket\\dic\\data\\DOA_cropped_gray_pad_0.tiff'
+#dic_name = 'C:\\Users\\potterst1\\Desktop\\Repositories\\BitBucket\\dic\\data\\DIC_S_cropped_gray_pad_0.tiff'
+#psfdi_name = 'C:\\Users\\potterst1\\Desktop\\Repositories\\BitBucket\\dic\\data\\DOA_cropped_gray_pad_0.tiff'
 dic_name = '/workspace/stpotter/git/bitbucket/dic/data/DIC_S_cropped_gray_pad_0.tiff'
 psfdi_name = '/workspace/stpotter/git/bitbucket/dic/data/DOSA_cropped_gray_pad_0.tiff'
-ref_image = cv2.imread(dic_name, -1)  # Read in image 'as is'
-ref_image = ref_image.astype('uint8')
+def_image = cv2.imread(dic_name, -1)  # Read in image 'as is'
+def_image = def_image.astype('uint8')
 
 # Translate image
-transx = np.array([[F11, F12, dx],
-                   [F21, F22, dy]])
-def_image = image_processing.im_warp(ref_image, transx)
+F = np.array([[F11, F12],
+            [F21, F22]])
+Finv = np.linalg.inv(F)
+F11i = Finv[0, 0]
+F12i = Finv[0, 1]
+F21i = Finv[1, 0]
+F22i = Finv[1, 1]
+transx = np.array([[F11i, F12i, dx],
+                   [F21i, F22i, dy]])
+ref_image = image_processing.im_warp(def_image, transx)
 
 # Format: [column index for start of X, column index for end of X, row index for start of Y, row index for end of Y]
 subregion_indices = np.array([225, 275, 225, 275])
