@@ -18,4 +18,4 @@ import errno
 import regex
 from scipy import signal
 import warnings
-import geomdl
+import geomdl.helpers as helpers
