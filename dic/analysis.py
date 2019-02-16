@@ -324,6 +324,32 @@ def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, uv_vals=None, ref_coef
     return znssd
 
 
+def scipy_minfun(disp_vec, *args):
+
+    '''
+    Minimization function for passing to scipy minimize
+
+    Assembles solution vector and arguments, then passes to mesh_znssd to compute cost
+
+    :param disp_vec: trial displacement vector. Shape is (1, 2*number of mesh control points
+    order is [delta x0, delta y0, delta x1, delta y1, etc.]
+    :type disp_vec: ndarray
+    :return: scalar value of mesh znssed at the trial displacement vector
+    :rtype: float
+    '''
+
+    # Assemble displacement vector
+    ctrlpt_disp = np.zeros((int(len(disp_vec) / 2), 2))
+    for i in range(0, len(disp_vec), 2):
+        k = i // 2  # Module to keep the index from over running lenght of control points
+        ctrlpt_disp[k, :] = np.array([disp_vec[i], disp_vec[i + 1]])
+
+    # Call znssd with defaults on all keyword params. This is slow, but okay for now
+    znssd = analysis.mesh_znssd(*args, ctrlpt_disp)
+
+    return znssd
+
+
 def minfun(delta, nodes_ref, ref_im, def_im):
     """
     Function for scipy minimizer to minimize
