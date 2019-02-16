@@ -35,12 +35,9 @@ pr.disable()
 
 # Read
 # Hard code absolute paths for now. Fix later'
-dic_name = 'C:\\Users\\potterst1\\Desktop\\Repositories\\BitBucket\\dic\\data\\DIC_S_cropped_gray_pad_0.tiff'
-psfdi_name = 'C:\\Users\\potterst1\\Desktop\\Repositories\\BitBucket\\dic\\data\\DOA_cropped_gray_pad_0.tiff'
 dic_name = '/workspace/stpotter/git/bitbucket/dic/data/DIC_S_cropped_gray_pad_0.tiff'
 psfdi_name = '/workspace/stpotter/git/bitbucket/dic/data/DOSA_cropped_gray_pad_0.tiff'
-ref_image = cv2.imread(dic_name, -1)  # Read in image 'as is'
-ref_image = ref_image.astype('uint8')
+def_image = cv2.imread(dic_name, -1)  # Read in image 'as is'
 
 # Translate image
 dx = 0.0
