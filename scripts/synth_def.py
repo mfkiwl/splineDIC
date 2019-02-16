@@ -35,7 +35,7 @@ pr.disable()
 
 # Parse input
 try:
-	method = sys.argv[1]
+	name = sys.argv[1]
 	dx = float(sys.argv[2])
 	dy = float(sys.argv[3])
 	F11 = float(sys.argv[4])
@@ -46,14 +46,19 @@ except:
 	print('Invalid command line arguments')
 	sys.exit(1)
 
-# Read
+# Change to output directory
+start = os.getcwd()
+try:
+    os.chdir(name)
+except:
+    os.makedirs(name)
+    os.chdir(name)
+
+# Read image data
 # Hard code absolute paths for now. Fix later'
-#dic_name = 'C:\\Users\\potterst1\\Desktop\\Repositories\\BitBucket\\dic\\data\\DIC_S_cropped_gray_pad_0.tiff'
-#psfdi_name = 'C:\\Users\\potterst1\\Desktop\\Repositories\\BitBucket\\dic\\data\\DOA_cropped_gray_pad_0.tiff'
 dic_name = '/workspace/stpotter/git/bitbucket/dic/data/DIC_S_cropped_gray_pad_0.tiff'
 psfdi_name = '/workspace/stpotter/git/bitbucket/dic/data/DOSA_cropped_gray_pad_0.tiff'
 def_image = cv2.imread(dic_name, -1)  # Read in image 'as is'
-def_image = def_image.astype('uint8')
 
 # Translate image
 F = np.array([[F11, F12],
@@ -67,8 +72,9 @@ transx = np.array([[F11i, F12i, dx],
                    [F21i, F22i, dy]])
 ref_image = image_processing.im_warp(def_image, transx)
 
+# Specify region of interest
 # Format: [column index for start of X, column index for end of X, row index for start of Y, row index for end of Y]
-subregion_indices = np.array([225, 275, 225, 275])
+subregion_indices = np.array([125, 375, 125, 375])
 
 # Control Points
 rowmin = subregion_indices[-2:].min()
@@ -101,6 +107,13 @@ ref_surf.delta = 0.01
 
 arg_tup = (ref_image, def_image, ref_surf)
 
+# Plot image with reference mesh nodes
+x = coords[:, 0]
+y = coords[:, 1]
+fig, ax = plt.subplots(figsize(10, 20))
+ax.imshow(ref_image, cmap='gray')
+ax.plot(x, y, 'o', color='red')
+plt.savefig(name + 'mesh.png')
 
 def minfun_nm(disp_vec, *args):
     '''
