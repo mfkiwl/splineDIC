@@ -9,7 +9,6 @@
 from . import np
 from . import warnings
 from . import numerics
-from . import geomdl
 from . import bs
 from . import gutil
 
