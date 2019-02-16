@@ -350,6 +350,11 @@ def scipy_minfun(disp_vec, *args):
     return znssd
 
 
+def rigid_guess():
+
+    pass
+
+
 def minfun(delta, nodes_ref, ref_im, def_im):
     """
     Function for scipy minimizer to minimize
