@@ -10,8 +10,8 @@ from . import np
 from . import warnings
 from . import numerics
 from . import geomdl
-from geomdl import BSpline as bs
-from geomdl import utilities as gutil
+from . import bs
+from . import gutil
 
 
 def discrete_znssd(ref_image, def_image):
