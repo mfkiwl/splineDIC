@@ -68,9 +68,9 @@ F11i = Finv[0, 0]
 F12i = Finv[0, 1]
 F21i = Finv[1, 0]
 F22i = Finv[1, 1]
-transx = np.array([[F11i, F12i, dx],
-                   [F21i, F22i, dy]])
-ref_image = image_processing.im_warp(def_image, transx)
+warp = np.array([[F11i, F12i, -dx],
+                   [F21i, F22i, -dy]])
+ref_image = image_processing.im_warp(def_image, warp)
 
 # Specify region of interest
 # Format: [column index for start of X, column index for end of X, row index for start of Y, row index for end of Y]
@@ -105,6 +105,7 @@ ref_surf.knotvector_v = gutil.generate_knot_vector(ref_surf.degree_v, num_ctrlpt
 
 ref_surf.delta = 0.01
 
+# Wrap minimization arguments into a tuple
 arg_tup = (ref_image, def_image, ref_surf)
 
 # Plot image with reference mesh nodes
@@ -114,6 +115,17 @@ fig, ax = plt.subplots(figsize(10, 20))
 ax.imshow(ref_image, cmap='gray')
 ax.plot(x, y, 'o', color='red')
 plt.savefig(name + 'mesh.png')
+
+# Test synthetically deformed control points
+synth_coords = np.zeros((len(coords), 2))
+for i in range(len(synth_coords)):
+    synth_coords[i, :] = np.matmul(F, coords[i, :]) + np.array([dx, dy])
+
+# Compute synthetic control point displacements
+synth_coords_disp = synth_coords - coords
+
+# Compute znssd between synthetic and ref coordinates
+synth_znssd = analysis.mesh_znssd(ref_image, def_image, ref_surf, synth_coords_disp)
 
 def minfun_nm(disp_vec, *args):
     '''
