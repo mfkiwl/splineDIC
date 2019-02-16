@@ -134,8 +134,8 @@ def def_grad(surf, u, v, disp_vec):
             # Bump incrementer
             k += 1
 
-            # Add identity tensor
-            F += np.eye(2)
+    # Add identity tensor
+    F += np.eye(2)
 
     return F
 
