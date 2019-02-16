@@ -136,3 +136,31 @@ def def_grad(surf, u, v, disp_vec):
             F += np.eye(2)
 
     return F
+
+
+# Surface approach
+def def_grad_surf(surf, u, v):
+    """"
+    Compute deformation gradient via a NURBS surface interpolation of control point displacement at u, v
+    parametric coordinates
+
+    :param surf: NURBS surface interpolating control point displacements
+    :type surf: NURBS surface object
+    :param u: u parametric location
+    :type u: float
+    :param v: v parametric location
+    :type v: float
+    :returns: computed inverse jacobian
+    :rtype: ndarray
+    """
+
+    F = np.zeros((2, 2))
+
+    tangents = surf.tangent((u, v), normalize=False)
+
+    F[0, 0] = 1 + tangents[1][0]  # d delta x1 dx1
+    F[0, 1] = tangents[1][1]  # d delta x1 dx2
+    F[1, 0] = tangents[2][1]  # d delta x2 dx1
+    F[1, 1] = 1 + tangents[2][1]  # d delta x2 dx2
+
+    return F
