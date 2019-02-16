@@ -8,6 +8,8 @@
 
 from . import np
 from . import helpers
+from . import plt
+from . import make_axes_locatable
 
 
 def jac_inv(surf, u, v):
@@ -164,3 +166,67 @@ def def_grad_surf(surf, u, v):
     F[1, 1] = 1 + tangents[2][1]  # d delta x2 dx2
 
     return F
+
+def vis_displacement(ref_image, disp_surf, rowmin, rowmax, colmin, colmax, name, save=True):
+
+    """
+    Function to compute and visualize pixel level displacement from strain analysis.
+    Displacement fields are plotted over the reference image
+
+    :param ref_image: Reference image data.
+    :type ref_image: ndarray
+    :param disp_surf: Displacement surface where each control point encodes the x, y displacement value
+    :type disp_surf: NURBS surface object
+    :param rowmin: minimum row number of region of interest.
+    :type rowmin: int
+    :param rowmax: maximum row number of region of interest
+    :type rowmax: int
+    :param colmin: minimum column number of region of interest
+    :type colmin: int
+    :param colmax: maximum colum number of region of interest
+    :type colmax: int
+    :param name: name of analysis
+    :type name: str
+    :param save: Optional. Boolean for displaying or saving plot. Default True
+    :type save: bool
+    :return: None
+    """
+
+    # Fill x and y displacement arrays
+    U = np.zeros(ref_image.shape) * np.nan
+    V = np.zeros(ref_image.shape) * np.nan
+
+    for i in range(rowmin, rowmax):
+        for j in range(colmin, colmax):
+            u_val = (j - colmin) / (colmax - colmin)
+            v_val = (i - rowmin) / (rowmax - rowmin)
+            disp = disp_surf.surfpt(u_val, v_val)
+            U[i, j] = disp[0]
+            V[i, j] = disp[1]
+
+    # Display
+    fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(10, 10))
+    im0 = ax0.imshow(ref_image, cmap='gray')
+    Uim = ax0.imshow(U, cmap='jet', alpha=0.7)
+    divider = make_axes_locatable(ax0)
+    cax0 = divider.append_axes('right', size='5%', pad=0.05)
+    fig.colorbar(Uim, cax=cax0)
+    Umin = 0.9 * np.nanmin(U)
+    Umax = 1.1 * np.nanmax(U)
+    Uim.set_clim(Umin, Umax)
+    ax0.set_title('X Displacement (Pixels)')
+
+    im1 = ax1.imshow(ref_image, cmap='gray')
+    Vim = ax1.imshow(V, cmap='jet', alpha=0.7)
+    divider = make_axes_locatable(ax1)
+    cax1 = divider.append_axes('right', size='5%', pad=0.05)
+    fig.colorbar(Vim, cax=cax1)
+    Vmin = 0.9 * np.nanmin(V)
+    Vmax = 0.9 * np.nanmax(V)
+    Vim.set_clim(Vmin, Vmax)
+    ax1.set_title('Y Displacement (Pixels)')
+
+    if save:
+        plt.savefig(name + 'Displacements.png')
+    else:
+        plt.show()
