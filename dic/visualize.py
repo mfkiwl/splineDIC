@@ -167,7 +167,8 @@ def def_grad_surf(surf, u, v):
 
     return F
 
-def vis_displacement(ref_image, disp_surf, rowmin, rowmax, colmin, colmax, name, save=True):
+
+def viz_displacement(ref_image, disp_surf, rowmin, rowmax, colmin, colmax, name, save=True):
 
     """
     Function to compute and visualize pixel level displacement from strain analysis.
@@ -228,5 +229,98 @@ def vis_displacement(ref_image, disp_surf, rowmin, rowmax, colmin, colmax, name,
 
     if save:
         plt.savefig(name + 'Displacements.png')
+    else:
+        plt.show()
+
+
+def viz_deformation(ref_image, ref_surf, rowmin, rowmax, colmin, colmax, coords_disp, name, save=True):
+
+    """
+    Function to compute and visualize pixel level deformation gradient from strain analysis.
+    Deformation fields are plotted over the reference image
+
+    :param ref_image: Reference image data.
+    :type ref_image: ndarray
+    :param ref_surf: Reference surface mesh
+    :type ref_surf: NURBS surface object
+    :param rowmin: minimum row number of region of interest.
+    :type rowmin: int
+    :param rowmax: maximum row number of region of interest
+    :type rowmax: int
+    :param colmin: minimum column number of region of interest
+    :type colmin: int
+    :param colmax: maximum colum number of region of interest
+    :type colmax: int
+    :param coords_disp: displacement of each mesh control point. Shape is (number of control points, 2) and is
+    [[delta x0, delta y0],[delta x1, delta y1], etc.]
+    :type coords_disp: ndarray
+    :param name: name of analysis
+    :type name: str
+    :param save: Optional. Boolean for displaying or saving plot. Default True
+    :type save: bool
+    :return: None
+    """
+
+    # Fill x and y displacement arrays
+    F11 = np.zeros(ref_image.shape) * np.nan
+    F12 = np.zeros(ref_image.shape) * np.nan
+    F21 = np.zeros(ref_image.shape) * np.nan
+    F22 = np.zeros(ref_image.shape) * np.nan
+
+    for i in range(rowmin, rowmax):
+        for j in range(colmin, colmax):
+            u_val = (j - colmin) / (colmax - colmin)
+            v_val = (i - rowmin) / (rowmax - rowmin)
+            F = def_grad(ref_surf, u_val, v_val, coords_disp)
+            F11[i, j] = F[0, 0]
+            F12[i, j] = F[0, 1]
+            F21[i, j] = F[1, 0]
+            F22[i, j] = F[1, 1]
+
+        # Display
+    fig, ((ax0, ax1), (ax2, ax3)) = plt.subplots(2, 2, figsize=(15, 10))
+
+    im0 = ax0.imshow(ref_image, cmap='gray')
+    F11im = ax0.imshow(F11, cmap='jet', alpha=0.7)
+    divider = make_axes_locatable(ax0)
+    cax0 = divider.append_axes('right', size='5%', pad=0.05)
+    fig.colorbar(F11im, cax=cax0)
+    F11min = 0.9 * np.nanmin(F11)
+    F11max = 1.1 * np.nanmax(F11)
+    F11im.set_clim(F11min, F11max)
+    ax0.set_title('F11')
+
+    im1 = ax1.imshow(ref_image, cmap='gray')
+    F12im = ax1.imshow(F12, cmap='jet', alpha=0.7)
+    divider = make_axes_locatable(ax1)
+    cax1 = divider.append_axes('right', size='5%', pad=0.05)
+    fig.colorbar(F12im, cax=cax1)
+    F12min = 0.9 * np.nanmin(F12)
+    F12max = 1.1 * np.nanmax(F12)
+    F12im.set_clim(F12min, F12max)
+    ax1.set_title('F12')
+
+    im2 = ax2.imshow(ref_image, cmap='gray')
+    F21im = ax2.imshow(F21, cmap='jet', alpha=0.7)
+    divider = make_axes_locatable(ax2)
+    cax2 = divider.append_axes('right', size='5%', pad=0.05)
+    fig.colorbar(F21im, cax=cax2)
+    F21min = 0.9 * np.nanmin(F21)
+    F21max = 1.1 * np.nanmax(F21)
+    F21im.set_clim(F21min, F21max)
+    ax2.set_title('F21')
+
+    im3 = ax3.imshow(ref_image, cmap='gray')
+    F22im = ax3.imshow(F22, cmap='jet', alpha=0.7)
+    divider = make_axes_locatable(ax3)
+    cax3 = divider.append_axes('right', size='5%', pad=0.05)
+    fig.colorbar(F22im, cax=cax3)
+    F22min = 0.9 * np.nanmin(F22)
+    F22max = 1.1 * np.nanmax(F22)
+    F22im.set_clim(F22min, F22max)
+    ax3.set_title('F22')
+
+    if save:
+        plt.savefig(name + 'Deformation.png')
     else:
         plt.show()
