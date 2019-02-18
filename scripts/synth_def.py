@@ -208,7 +208,7 @@ fname = name + 'Min'
 visualize.viz_deformation(ref_image, ref_surf, rowmin, rowmax, colmin, colmax, coords_disp, fname)
 
 print('Deformation gradient at center of ROI from minimization control points')
-print(visualize.def_grad(ref_surf, 0.5, 0.5, coords_disp)
+print(visualize.def_grad(ref_surf, 0.5, 0.5, coords_disp))
 
 #pr.disable()
 #pr.dump_stats('opt.pstat')
