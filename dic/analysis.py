@@ -11,6 +11,7 @@ from . import warnings
 from . import numerics
 from . import bs
 from . import gutil
+from . import signal
 
 
 def discrete_znssd(ref_image, def_image):
@@ -344,14 +345,58 @@ def scipy_minfun(disp_vec, *args):
         ctrlpt_disp[k, :] = np.array([disp_vec[i], disp_vec[i + 1]])
 
     # Call znssd with defaults on all keyword params. This is slow, but okay for now
-    znssd = analysis.mesh_znssd(*args, ctrlpt_disp)
+    znssd = mesh_znssd(*args, ctrlpt_disp)
 
     return znssd
 
 
-def rigid_guess():
+def rigid_guess(ref_image, def_image, rowmin, rowmax, colmin, colmax, num_cpts):
 
-    pass
+    """
+    Compute initial rigid body displacement guess via correlation of deformed and reference subimage
+
+    :param ref_image: reference image
+    :type ref_image: ndarray
+    :param def_image: deformed image
+    :type def_image: ndarray
+    :param rowmin: minimum row number of roi in ref image
+    :type rowmin: int
+    :param rowmax: maximum row number of roi in ref image
+    :type rowmax: int
+    :param colmin: minimum column number of roi in ref image
+    :type colmin: int
+    :param colmax: maximum column number of roi in ref image
+    :type colmax: int
+    :param num_cpts: Number of control points in the mes
+    :type num_cpts: int
+    :return: 1D array of rigid displacement guess [delta x0 delta y0 delta x1 delta y1 etc]
+    :rtype: ndarray
+    """
+    # Compute rigid initial correlation with 2d correlation
+    rowmid = int(np.mean([rowmin, rowmax]))
+    colmid = int(np.mean([colmin, colmax]))
+
+    # Get subimage
+    subimage = np.copy(ref_image[rowmin:rowmax, colmin:colmax])
+
+    # Normalize images
+    ref_subnorm = subimage - subimage.mean()
+    def_norm = def_image - def_image.mean()
+
+    # Correlate
+    corr = signal.correlate2d(def_norm, ref_subnorm, boundary='symm', mode='same')
+    midy, midx = np.unravel_index(np.argmax(corr), corr.shape)
+
+    initx = (midx + 1) - colmid
+    inity = (midy + 1) - rowmid
+
+    # Setup initial displacement vector
+    int_disp_vec = np.zeros(2*len(num_cpts))
+    for i in range(0, len(int_disp_vec), 2):
+        int_disp_vec[i] = initx
+        int_disp_vec[i+1] = inity
+
+    return int_disp_vec
 
 
 def minfun(delta, nodes_ref, ref_im, def_im):
@@ -359,7 +404,7 @@ def minfun(delta, nodes_ref, ref_im, def_im):
     Function for scipy minimizer to minimize
 
     :param delta: 1D arrary of rigid body rotations
-    :type delata: ndarray
+    :type delta: ndarray
     :return: ZNSSD of deformed ref and deformed image
     :rtype: float
     """
