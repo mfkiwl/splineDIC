@@ -1,0 +1,96 @@
+RUNNING THE L-BFGS-B CODE
+
+           * * *
+
+Machine precision = 2.220D-16
+ N =           32     M =           10
+ This problem is unconstrained.
+
+At X0         0 variables are exactly at the bounds
+
+At iterate    0    f=  3.51214D+03    |proj g|=  6.51757D+02
+
+At iterate    1    f=  4.67612D+02    |proj g|=  3.99313D+02
+
+At iterate    2    f=  1.43129D+02    |proj g|=  1.89845D+02
+
+At iterate    3    f=  3.64774D+01    |proj g|=  8.09851D+01
+
+At iterate    4    f=  2.47078D+01    |proj g|=  2.08264D+01
+
+At iterate    5    f=  2.33435D+01    |proj g|=  1.65958D+01
+
+           * * *
+
+Tit   = total number of iterations
+Tnf   = total number of function evaluations
+Tnint = total number of segments explored during Cauchy searches
+Skip  = number of BFGS updates skipped
+Nact  = number of active bounds at final generalized Cauchy point
+Projg = norm of the final projected gradient
+F     = final function value
+
+           * * *
+
+   N    Tit     Tnf  Tnint  Skip  Nact     Projg        F
+   32      5      8      1     0     0   1.660D+01   2.334D+01
+  F =   23.343527992893488     
+
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT                 
+
+ Cauchy                time 0.000E+00 seconds.
+ Subspace minimization time 0.000E+00 seconds.
+ Line search           time 0.000E+00 seconds.
+
+ Total User time 0.000E+00 seconds.
+
+Synthetic ZNSSD: 21.709066750750377
+Synthetic Coordinate Displacements
+[[2.         0.        ]
+ [2.33333333 0.        ]
+ [2.66666667 0.        ]
+ [3.         0.        ]
+ [2.         0.        ]
+ [2.33333333 0.        ]
+ [2.66666667 0.        ]
+ [3.         0.        ]
+ [2.         0.        ]
+ [2.33333333 0.        ]
+ [2.66666667 0.        ]
+ [3.         0.        ]
+ [2.         0.        ]
+ [2.33333333 0.        ]
+ [2.66666667 0.        ]
+ [3.         0.        ]]
+Deformation gradient at center of ROI from synthetic control points
+[[1.   0.01]
+ [0.   1.  ]]
+Actual Rigid X Displacement: 0.0
+Actual Rigid Y Displacement: 0.0
+Mesh Details: 4 by 4
+Initial Guess -  X Displacement: 2.0
+Initial Guess - Y Displacement: 0.0
+residual
+23.34352799289349
+final control point displacements
+[[ 1.97664130e+00 -9.28372727e-03]
+ [ 2.36202412e+00  6.38404270e-03]
+ [ 2.70178912e+00  1.60936874e-02]
+ [ 2.93226264e+00 -1.84237188e-02]
+ [ 1.96871496e+00 -4.14312881e-03]
+ [ 2.35037997e+00  9.12215734e-03]
+ [ 2.70037713e+00  7.20424223e-03]
+ [ 2.94400639e+00 -1.49244098e-02]
+ [ 1.98270145e+00 -3.73814347e-03]
+ [ 2.33706769e+00  2.87339742e-03]
+ [ 2.70010484e+00 -4.25509605e-03]
+ [ 2.98919763e+00 -1.34928040e-02]
+ [ 1.98582406e+00  1.24683776e-04]
+ [ 2.32307641e+00  2.68876489e-03]
+ [ 2.68737404e+00 -1.04064951e-03]
+ [ 3.01314005e+00  1.79427499e-02]]
+Deformation gradient at center of ROI from minimization control points
+[[ 9.99951621e-01  1.00982491e-02]
+ [-6.37515635e-05  9.99930542e-01]]
+execution time (s)
+984.64

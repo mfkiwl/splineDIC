@@ -1,0 +1,50 @@
+Synthetic ZNSSD: 2.290548976513494e-10
+Synthetic Coordinate Displacements
+[[5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]]
+Deformation gradient at center of ROI from synthetic control points
+[[1. 0.]
+ [0. 1.]]
+Actual Rigid X Displacement: 5.0
+Actual Rigid Y Displacement: 0.0
+Mesh Details: 4 by 4
+Initial Guess -  X Displacement: 5.0
+Initial Guess - Y Displacement: 0.0
+residual
+2.290548976513494e-10
+final control point displacement
+[[5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]
+ [5. 0.]]
+Deformation gradient at center of ROI from minimization control points
+[[1. 0.]
+ [0. 1.]]
+execution time (s)
+48.07
