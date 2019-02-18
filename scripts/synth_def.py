@@ -164,7 +164,6 @@ int_disp_vec = analysis.rigid_guess(ref_image, def_image, rowmin, rowmax, colmin
 residual = analysis.scipy_minfun(int_disp_vec, *arg_tup)
 
 if residual > 1e-6:
-    print('Begin minimization')
     result = sciopt.minimize(analysis.scipy_minfun, int_disp_vec, args=arg_tup, method='L-BFGS-B', jac='2-point', bounds=None, options={'maxiter': 10, 'disp': True})
 
 print('Actual Rigid X Displacement: {}'.format(dx))
