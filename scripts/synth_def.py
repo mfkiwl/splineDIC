@@ -76,7 +76,7 @@ ref_image = image_processing.im_warp(def_image, warp)
 
 # Specify region of interest
 # Format: [column index for start of X, column index for end of X, row index for start of Y, row index for end of Y]
-subregion_indices = np.array([225, 275, 225, 275])
+subregion_indices = np.array([200, 300, 200, 300])
 
 # Control Points
 rowmin = subregion_indices[-2:].min()
