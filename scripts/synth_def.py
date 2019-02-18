@@ -144,10 +144,10 @@ disp_surf.knotvector_u = gutil.generate_knot_vector(disp_surf.degree_u, num_ctrl
 disp_surf.knotvector_v = gutil.generate_knot_vector(disp_surf.degree_v, num_ctrlpts)
 
 disp_surf.delta = 0.01
-fname = name + 'SynthDisplacement'
+fname = name + 'Synth'
 visualize.viz_displacement(ref_image, disp_surf, rowmin, rowmax, colmin, colmax, fname)
 
-fname = name + 'SynthDeformation'
+fname = name + 'Synth'
 # Visualize synthetic deformation results
 visualize.viz_deformation(ref_image, ref_surf, rowmin, rowmax, colmin, colmax, synth_coords_disp, fname)
 
@@ -200,10 +200,10 @@ disp_surf.knotvector_v = gutil.generate_knot_vector(disp_surf.degree_v, num_ctrl
 
 disp_surf.delta = 0.01
 
-fname = name + 'MinDisplacement'
+fname = name + 'Min'
 visualize.viz_displacement(ref_image, disp_surf, rowmin, rowmax, colmin, colmax, fname)
 # Visualize minimization result deformation
-fname = name + 'MinDeformation'
+fname = name + 'Min'
 visualize.viz_deformation(ref_image, ref_surf, rowmin, rowmax, colmin, colmax, coords_disp, fname)
 
 #pr.disable()
