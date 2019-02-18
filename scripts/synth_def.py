@@ -76,7 +76,7 @@ ref_image = image_processing.im_warp(def_image, warp)
 
 # Specify region of interest
 # Format: [column index for start of X, column index for end of X, row index for start of Y, row index for end of Y]
-subregion_indices = np.array([125, 375, 125, 375])
+subregion_indices = np.array([225, 275, 225, 275])
 
 # Control Points
 rowmin = subregion_indices[-2:].min()
@@ -110,7 +110,7 @@ ref_surf.delta = 0.01
 # Plot image with reference mesh nodes
 x = coords[:, 0]
 y = coords[:, 1]
-fig, ax = plt.subplots(figsize(10, 20))
+fig, ax = plt.subplots(figsize=(10, 20))
 ax.imshow(ref_image, cmap='gray')
 ax.plot(x, y, 'o', color='red')
 plt.savefig(name + 'mesh.png')
@@ -144,11 +144,12 @@ disp_surf.knotvector_u = gutil.generate_knot_vector(disp_surf.degree_u, num_ctrl
 disp_surf.knotvector_v = gutil.generate_knot_vector(disp_surf.degree_v, num_ctrlpts)
 
 disp_surf.delta = 0.01
-visualize.viz_displacement(ref_image, disp_surf, rowmin, rowmax, colmin, colmax, name + 'SynthDisplacement.png')
+fname = name + 'SynthDisplacement'
+visualize.viz_displacement(ref_image, disp_surf, rowmin, rowmax, colmin, colmax, fname)
 
+fname = name + 'SynthDeformation'
 # Visualize synthetic deformation results
-visualize.viz_deformation(ref_image, ref_surf, rowmin, rowmax, colmin, colmax, synth_coords_disp,
-                          name + 'SynthDeformation.png')
+visualize.viz_deformation(ref_image, ref_surf, rowmin, rowmax, colmin, colmax, synth_coords_disp, fname)
 
 # Wrap minimization arguments into a tuple
 arg_tup = (ref_image, def_image, ref_surf)
@@ -199,9 +200,11 @@ disp_surf.knotvector_v = gutil.generate_knot_vector(disp_surf.degree_v, num_ctrl
 
 disp_surf.delta = 0.01
 
-visualize.viz_displacement(ref_image, disp_surf, rowmin, rowmax, colmin, colmax, name + 'MinDisplacement.png')
+fname = name + 'MinDisplacement'
+visualize.viz_displacement(ref_image, disp_surf, rowmin, rowmax, colmin, colmax, fname)
 # Visualize minimization result deformation
-visualize.viz_deformation(ref_image, ref_surf, rowmin, rowmax, colmin, colmax, coords_disp, name + 'MinDeformation.png')
+fname = name + 'MinDeformation'
+visualize.viz_deformation(ref_image, ref_surf, rowmin, rowmax, colmin, colmax, coords_disp, fname)
 
 #pr.disable()
 #pr.dump_stats('opt.pstat')
