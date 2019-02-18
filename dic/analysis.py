@@ -391,7 +391,7 @@ def rigid_guess(ref_image, def_image, rowmin, rowmax, colmin, colmax, num_cpts):
     inity = (midy + 1) - rowmid
 
     # Setup initial displacement vector
-    int_disp_vec = np.zeros(2*len(num_cpts))
+    int_disp_vec = np.zeros(2*num_cpts)
     for i in range(0, len(int_disp_vec), 2):
         int_disp_vec[i] = initx
         int_disp_vec[i+1] = inity
