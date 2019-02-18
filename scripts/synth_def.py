@@ -152,7 +152,7 @@ fname = name + 'Synth'
 visualize.viz_deformation(ref_image, ref_surf, rowmin, rowmax, colmin, colmax, synth_coords_disp, fname)
 
 print('Deformation gradient at center of ROI from synthetic control points')
-print(visualize.def_grad(ref_surf, 0.5, 0.5, synth_coords_disp)
+print(visualize.def_grad(ref_surf, 0.5, 0.5, synth_coords_disp))
 
 # Wrap minimization arguments into a tuple
 arg_tup = (ref_image, def_image, ref_surf)
