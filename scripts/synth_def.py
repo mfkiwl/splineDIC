@@ -151,9 +151,11 @@ fname = name + 'Synth'
 # Visualize synthetic deformation results
 visualize.viz_deformation(ref_image, ref_surf, rowmin, rowmax, colmin, colmax, synth_coords_disp, fname)
 
+print('Deformation gradient at center of ROI from synthetic control points')
+print(visualize.def_grad(ref_surf, 0.5, 0.5, synth_coords_disp)
+
 # Wrap minimization arguments into a tuple
 arg_tup = (ref_image, def_image, ref_surf)
-
 
 # compute mesh znssd one time and exit if its low enough
 int_disp_vec = analysis.rigid_guess(ref_image, def_image, rowmin, rowmax, colmin, colmax, len(coords))
@@ -164,7 +166,7 @@ int_disp_vec = analysis.rigid_guess(ref_image, def_image, rowmin, rowmax, colmin
 residual = analysis.scipy_minfun(int_disp_vec, *arg_tup)
 
 if residual > 1e-6:
-    result = sciopt.minimize(analysis.scipy_minfun, int_disp_vec, args=arg_tup, method='L-BFGS-B', jac='2-point', bounds=None, options={'maxiter': 10, 'disp': True})
+    result = sciopt.minimize(analysis.scipy_minfun, int_disp_vec, args=arg_tup, method='L-BFGS-B', jac='2-point', bounds=None, options={'maxiter': 5, 'disp': True})
 
 print('Actual Rigid X Displacement: {}'.format(dx))
 print('Actual Rigid Y Displacement: {}'.format(dy))
@@ -205,6 +207,10 @@ visualize.viz_displacement(ref_image, disp_surf, rowmin, rowmax, colmin, colmax,
 fname = name + 'Min'
 visualize.viz_deformation(ref_image, ref_surf, rowmin, rowmax, colmin, colmax, coords_disp, fname)
 
+print('Deformation gradient at center of ROI from minimization control points')
+print(visualize.def_grad(ref_surf, 0.5, 0.5, coords_disp)
+
 #pr.disable()
 #pr.dump_stats('opt.pstat')
 print('execution time (s)')
+
