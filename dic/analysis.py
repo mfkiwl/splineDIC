@@ -206,7 +206,7 @@ def deform_mesh(ref_mesh, cpts_disp):
     return def_mesh
 
 
-def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, uv_vals=None, ref_coeff=None, def_coeff=None, interp_order='cubic'):
+def mesh_znssd(ref_image, def_image, ref_mesh, uv_vals, ref_coeff, def_coeff, interp_order, cpts_disp):
     """
     Compute the zero normalized sum of square differences over an entire mesh between two images
     See Pan et al. Meas Sci Tech 2009 for details.
@@ -217,9 +217,7 @@ def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, uv_vals=None, ref_coef
     :type def_image: ndarray
     :param ref_mesh: reference state B-spline mesh
     :type ref_mesh: Bspline surface
-    :param cpts_disp: control point displacements [delta X, delta Y]
-    :type cpts_disp: ndarray
-    :param uv_vals: Optional. Array containing u, v parameterization of the pixels in the reference image
+    :param uv_vals: Array containing u, v parameterization of the pixels in the reference image
     :type uv_vals: ndarray
     :param ref_coeff: 2D array of b-spline coefficients for reference image
     :type ref_coeff: ndarray
@@ -227,6 +225,8 @@ def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, uv_vals=None, ref_coef
     :type def_coeff: ndarray
     :param interp_order: order of b-spline interpolation. Options: {'cubic', 'quintic'}
     :type interp_order: str
+    :param cpts_disp: control point displacements [delta X, delta Y]
+    :type cpts_disp: ndarray
     :return: ZNSSD between the two images in the mesh region
     :rtyp: float
     """
@@ -238,19 +238,13 @@ def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, uv_vals=None, ref_coef
     if def_image.ndim != 2:
         raise ValueError('Deformed image input must be 2d')
     
-    # Check if reference image interpolation coefficents have been set
-    if not ref_coeff is None:
-        if not ref_coeff.shape == ref_image.shape:
-            raise ValueError('Coefficient array and image array must have same dimension (reference image)')
-    else:
-        ref_coeff = numerics.image_interp(ref_image, degree=interp_order)
+    # Check if reference image interpolation coefficients are correctly sized
+    if not ref_coeff.shape == ref_image.shape:
+        raise ValueError('Coefficient array and image array must have same dimension (reference image)')
     
-    # Check if deformed image interpolation coefficeints have been set
-    if not def_coeff is None:
-        if not def_coeff.shape == def_image.shape:
-            raise ValueError('Coefficient array and image array must have same dimension (deformed image)')
-    else:
-        def_coeff = numerics.image_interp(def_image, degree=interp_order)
+    # Check if deformed image interpolation coefficients are correctly sized
+    if not def_coeff.shape == def_image.shape:
+        raise ValueError('Coefficient array and image array must have same dimension (deformed image)')
 
     if ref_image.shape != def_image.shape:
         raise ValueError('Images must be the same size')
@@ -287,16 +281,9 @@ def mesh_znssd(ref_image, def_image, ref_mesh, cpts_disp, uv_vals=None, ref_coef
     # For every pixel in f, compute the new location in g
     g_mesh = np.zeros(f_mesh.shape)
 
-    # If uv_vals haven't been precomputed via projection, set them as a linear mapping of pixel coord to [0, 1]
-    if uv_vals is None:
-        uv_vals = np.zeros((2,) + f_mesh.shape)
-        for i in range(0, rowmax):
-            for j in range(0, colmax):
-                uv_vals[0, i, j] = j / colmax
-                uv_vals[1, i, j] = i / rowmax
-    else:
-        if not uv_vals.shape == ref_image.shape:
-            raise ValueError('u, v parameterization array must be same shape as reference image')
+    # Check uv_vals have same shape as ref image
+    if not uv_vals.shape == ref_image.shape:
+        raise ValueError('u, v parameterization array must be same shape as reference image')
 
     for i in range(0, rowmax):
         for j in range(0, colmax):
