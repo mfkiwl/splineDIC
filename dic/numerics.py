@@ -99,6 +99,43 @@ def image_interp_bicubic(im_data):
 
     return coeffs
 
+def eval_interp_spline(coeffs, x, y, shape):
+
+    """
+    Evaluate bicubic interpolation at position x,y on image with corresponding shape and coefficients
+
+    :param coeffs: Array of bicubic coefficients. Shape ((rows - 1) * (cols -1), 4, 4)
+    :type coeffs: ndarray
+    :param x: X coordinate of interpolation point position
+    :type x: float
+    :param y: Y coordinate of interpolation point position
+    :type y: float
+    :param shape: Tuple of interpolation image shape
+    :type shape: tuple
+    :return: Interpolated value at x, y
+    :rtype: float
+    """
+
+    row = int(np.floor(y))
+    col = int(np.floor(x))
+
+    rows = shape[0] - 1
+    cols = shape[1] - 1
+
+    xval = x % 1.0
+    yval = y % 1.0
+
+    A = coeffs[col * rows + row, :, :]
+
+    # Switch x and y because of the image coord sys
+
+    xar = np.array([1.0, xval, xval ** 2, xval ** 3])
+    yar = np.array([1.0, yval, yval ** 2, yval ** 3])
+
+    p = yar @ A @ xar
+
+    return p
+
 
 def image_interp_spline(im_data, degree='cubic'):
 
