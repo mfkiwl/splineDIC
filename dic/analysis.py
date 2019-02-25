@@ -293,7 +293,8 @@ def mesh_znssd(ref_image, def_image, ref_mesh, uv_vals, ref_coeff, def_coeff, in
             # Compute the displacement by interpolating
             new_pt = def_mesh.surfpt(u_val, v_val)
 
-            g_mesh[i, j] = numerics.eval_interp_spline(new_pt[0], new_pt[1], def_image, coeffs=def_coeff, order=3)
+            g_mesh[i, j] = numerics.eval_interp_spline(new_pt[0], new_pt[1], def_image, coeffs=def_coeff,
+                                                       order=interp_order)
 
     # Compute mean of this deformed image mesh
     gmean = np.mean(g_mesh)

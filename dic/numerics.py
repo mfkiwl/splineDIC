@@ -99,7 +99,7 @@ def image_interp_bicubic(im_data):
 
     return coeffs
 
-def eval_interp_spline(coeffs, x, y, shape):
+def eval_interp_bicubic(coeffs, x, y, shape):
 
     """
     Evaluate bicubic interpolation at position x,y on image with corresponding shape and coefficients
@@ -185,7 +185,7 @@ def eval_interp_spline(x, y, image, coeffs=None, order='cubic'):
     :param coeffs: Optional. 2D array of b spline interpolation coefficients
     :type coeffs: ndarray
     :param order: Optional. Order of spline interpolation and evaluation
-    :type order: int
+    :type order: str
     :return: interpolated value as location [x, y]
     :rtype: float
     """
@@ -211,7 +211,7 @@ def eval_interp_spline(x, y, image, coeffs=None, order='cubic'):
     colindex = np.ceil(x - (order + 1) / 2).astype('int')  # Cast to int
     rowindex = np.ceil(y - (order + 1) / 2).astype('int')  # Cast to int
 
-    if order == 3:
+    if order == 'cubic':
         # Alias function
         cubic = signal.cubic
 
