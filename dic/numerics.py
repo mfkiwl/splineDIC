@@ -99,6 +99,7 @@ def image_interp_bicubic(im_data):
 
     return coeffs
 
+
 def eval_interp_bicubic(coeffs, x, y, shape):
 
     """
