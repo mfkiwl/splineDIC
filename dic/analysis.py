@@ -206,7 +206,7 @@ def deform_mesh(ref_mesh, cpts_disp):
     return def_mesh
 
 
-def mesh_znssd(ref_image, def_image, ref_mesh, uv_vals, ref_coeff, def_coeff, interp_order, cpts_disp):
+def mesh_znssd_spline(ref_image, def_image, ref_mesh, uv_vals, ref_coeff, def_coeff, interp_order, cpts_disp):
     """
     Compute the zero normalized sum of square differences over an entire mesh between two images
     See Pan et al. Meas Sci Tech 2009 for details.
@@ -333,7 +333,7 @@ def scipy_minfun(disp_vec, *args):
         ctrlpt_disp[k, :] = np.array([disp_vec[i], disp_vec[i + 1]])
 
     # Call znssd with defaults on all keyword params. This is slow, but okay for now
-    znssd = mesh_znssd(*args, ctrlpt_disp)
+    znssd = mesh_znssd_spline(*args, ctrlpt_disp)
 
     return znssd
 

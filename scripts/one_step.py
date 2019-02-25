@@ -105,7 +105,7 @@ def minfun_nm(disp_vec, *args):
         ctrlpt_disp[k, :] = np.array([disp_vec[i], disp_vec[i + 1]])
 
     # Call znssd with defaults on all keyward params. This will make it a bit slower, but whatever for now
-    znssd = analysis.mesh_znssd(*args, ctrlpt_disp)
+    znssd = analysis.mesh_znssd_spline(*args, ctrlpt_disp)
 
     return znssd
 

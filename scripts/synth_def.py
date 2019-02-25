@@ -134,7 +134,7 @@ for i in range(len(synth_coords)):
 synth_coords_disp = synth_coords - coords
 
 # Compute znssd between synthetic and ref coordinates
-synth_znssd = analysis.mesh_znssd(ref_image, def_image, ref_surf, synth_coords_disp)
+synth_znssd = analysis.mesh_znssd_spline(ref_image, def_image, ref_surf, synth_coords_disp)
 
 # Print the synthetic info to stdout
 print('Synthetic ZNSSD: {}'.format(synth_znssd))
