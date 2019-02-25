@@ -114,8 +114,8 @@ ref_surf.delta = 0.01
 
 
 # Get interpolation coefficients
-ref_coeff = numerics.image_interp(ref_image, degree=interp_order)
-def_coeff = numerics.image_interp(def_image, degree=interp_order)
+ref_coeff = numerics.image_interp_spline(ref_image, degree=interp_order)
+def_coeff = numerics.image_interp_spline(def_image, degree=interp_order)
 
 # Plot image with reference mesh nodes
 x = coords[:, 0]

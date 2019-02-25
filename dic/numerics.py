@@ -11,7 +11,7 @@ from . import np
 from . import signal
 
 
-def image_interp(im_data, degree='cubic'):
+def image_interp_spline(im_data, degree='cubic'):
 
     """
     Compute either bicubic or biquinitic spline interpolation of 2D image data.
@@ -43,7 +43,7 @@ def image_interp(im_data, degree='cubic'):
     return coefficients
 
 
-def eval_interp(x, y, image, coeffs=None, order=3):
+def eval_interp_spline(x, y, image, coeffs=None, order='cubic'):
     """
     Evaluate an image at a non-integer location.
 
@@ -79,7 +79,7 @@ def eval_interp(x, y, image, coeffs=None, order=3):
         if not coeffs.shape == image.shape:
             raise ValueError('Coefficient array and Image array must have the same dimension')
     else:
-        coeffs = image_interp(image, degree=order)
+        coeffs = image_interp_spline(image, degree=order)
 
     # Get the row and column start index based on x, y
     colindex = np.ceil(x - (order + 1) / 2).astype('int')  # Cast to int
