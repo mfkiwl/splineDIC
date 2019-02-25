@@ -281,9 +281,9 @@ def mesh_znssd_bicubic(roi, ref_shape, def_shape, ref_mesh, uv_vals, ref_coeff, 
     '''
     if not uv_vals.shape == ref_image.shape:
         raise ValueError('u, v parameterization array must be same shape as reference image')
-    '''
     if not uv_vals.shape == roi.shape:
         raise ValueError('u, v parameterization array must be same shape as ROI')
+    '''
 
     rowmax = roi.shape[0]
     colmax = roi.shape[1]
@@ -296,7 +296,7 @@ def mesh_znssd_bicubic(roi, ref_shape, def_shape, ref_mesh, uv_vals, ref_coeff, 
             # Compute the displacement by interpolating
             new_pt = def_mesh.surfpt(u_val, v_val)
 
-            g_mesh[i, j] = numerics.eval_interp_spline(def_coeff, new_pt[0], new_pt[1], def_shape)
+            g_mesh[i, j] = numerics.eval_interp_bicubic(def_coeff, new_pt[0], new_pt[1], def_shape)
 
     # Compute mean of this deformed image mesh
     gmean = np.mean(g_mesh)

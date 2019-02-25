@@ -52,7 +52,7 @@ def bicubic_coefficients(im_data, im_data_x, im_data_y, im_data_xy):
 
     shape = ((row - 1) * (col - 1), 4, 4)
 
-    coeffs = np.zeros(shape, dytpe=np.float64)
+    coeffs = np.zeros(shape, dtype=np.float64)
 
     C = np.array([[1., 0., 0., 0.],
                   [0., 0., 1., 0.],
