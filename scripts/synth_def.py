@@ -56,6 +56,9 @@ except OSError:
     os.makedirs(name)
     os.chdir(name)
 
+# Setting for computation
+interp_order = 'cubic'
+
 # Read image data
 # Hard code absolute paths for now. Fix later'
 dic_name = '/workspace/stpotter/git/bitbucket/dic/data/DIC_S_cropped_gray_pad_0.tiff'
@@ -106,6 +109,13 @@ ref_surf.knotvector_u = gutil.generate_knot_vector(ref_surf.degree_u, num_ctrlpt
 ref_surf.knotvector_v = gutil.generate_knot_vector(ref_surf.degree_v, num_ctrlpts)
 
 ref_surf.delta = 0.01
+
+# Compute ROI uv values
+
+
+# Get interpolation coefficients
+ref_coeff = numerics.image_interp(ref_image, degree=interp_order)
+def_coeff = numerics.image_interp(def_image, degree=interp_order)
 
 # Plot image with reference mesh nodes
 x = coords[:, 0]
