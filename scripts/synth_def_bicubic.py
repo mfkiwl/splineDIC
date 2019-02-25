@@ -1,7 +1,8 @@
 '''
-.. script:: synth_def
+.. script:: synth_def_bicubic
     :platform: Unix, Windows
-    :synopsis: Compute a NURBS DIC analysis between two images synthetically deformed.
+    :synopsis: Compute a NURBS DIC analysis between two images synthetically deformed using bicubic interpolation
+    methods
 
 .. scriptauthor:: Sam Potter <spotter1642@gmail.com>
 '''
@@ -110,12 +111,36 @@ ref_surf.knotvector_v = gutil.generate_knot_vector(ref_surf.degree_v, num_ctrlpt
 
 ref_surf.delta = 0.01
 
-# Compute ROI uv values
+#TODO: MAKE THIS A FUNCTION
+# Compute ROI and ROI uv values
+# Get min and max column values from min/max reference ctrlpt node x values
+min_col_index = np.min(coords[:, 0]).astype('int')
+max_col_index = np.max(coords[:, 0]).astype('int')
 
+# Get maximum column number for sub image array from ref ctrlpt node x values
+colmax = (np.max(coords[:, 0]) - np.min(coords[:, 0])).astype('int')
+
+# Get min and max column values from min/max reference ctrlpt node x values
+min_row_index = np.min(coords[:, 1]).astype('int')
+max_row_index = np.max(coords[:, 1]).astype('int')
+
+# Get min and max row values from min/max reference ctrlpt node y values
+rowmax = (np.max(coords[:, 1]) - np.min(coords[:, 1])).astype('int')
+
+# Set reference image mesh over image
+roi = ref_image[min_row_index:max_row_index, min_col_index:max_col_index]
+
+uv_vals = np.zeros((2, )+ roi.shape)
+for i in range(0, rowmax):
+    for j in range(0, colmax):
+        uv_vals[0, i, j] = j / colmax
+        uv_vals[1, i, j] = i / rowmax
+
+#TODO: Up to here
 
 # Get interpolation coefficients
-ref_coeff = numerics.image_interp_spline(ref_image, degree=interp_order)
-def_coeff = numerics.image_interp_spline(def_image, degree=interp_order)
+ref_coeff = numerics.image_interp_bicubic(ref_image)
+def_coeff = numerics.image_interp_bicubic(def_image)
 
 # Plot image with reference mesh nodes
 x = coords[:, 0]
@@ -134,7 +159,8 @@ for i in range(len(synth_coords)):
 synth_coords_disp = synth_coords - coords
 
 # Compute znssd between synthetic and ref coordinates
-synth_znssd = analysis.mesh_znssd_spline(ref_image, def_image, ref_surf, synth_coords_disp)
+synth_znssd = analysis.mesh_znssd_bicubic(roi, ref_image.shape, def_image.shape, ref_surf, uv_vals, ref_coeff,
+                                          def_coeff, synth_coords_disp)
 
 # Print the synthetic info to stdout
 print('Synthetic ZNSSD: {}'.format(synth_znssd))
@@ -165,7 +191,7 @@ print('Deformation gradient at center of ROI from synthetic control points')
 print(visualize.def_grad(ref_surf, 0.5, 0.5, synth_coords_disp))
 
 # Wrap minimization arguments into a tuple
-arg_tup = (ref_image, def_image, ref_surf)
+arg_tup = (roi, ref_image.shape, def_image.shape, ref_surf, uv_vals, ref_coeff, def_coeff)
 
 # compute mesh znssd one time and exit if its low enough
 int_disp_vec = analysis.rigid_guess(ref_image, def_image, rowmin, rowmax, colmin, colmax, len(coords))
@@ -176,7 +202,8 @@ int_disp_vec = analysis.rigid_guess(ref_image, def_image, rowmin, rowmax, colmin
 residual = analysis.scipy_minfun_spline(int_disp_vec, *arg_tup)
 
 if residual > 1e-6:
-    result = sciopt.minimize(analysis.scipy_minfun_spline, int_disp_vec, args=arg_tup, method='L-BFGS-B', jac='2-point', bounds=None, options={'maxiter': 5, 'disp': True})
+    result = sciopt.minimize(analysis.scipy_minfun_spline, int_disp_vec, args=arg_tup, method='L-BFGS-B', jac='2-point',
+                             bounds=None, options={'maxiter': 5, 'disp': True})
 
 print('Actual Rigid X Displacement: {}'.format(dx))
 print('Actual Rigid Y Displacement: {}'.format(dy))
