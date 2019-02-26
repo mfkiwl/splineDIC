@@ -63,8 +63,10 @@ interp_order = 'cubic'
 
 # Read image data
 # Hard code absolute paths for now. Fix later'
-dic_name = '/workspace/stpotter/git/bitbucket/dic/data/DIC_S_cropped_gray_pad_0.tiff'
-psfdi_name = '/workspace/stpotter/git/bitbucket/dic/data/DOSA_cropped_gray_pad_0.tiff'
+dic_name = 'C:\\Users\\potterst1\\Desktop\\Repositories\\BitBucket\\dic\\data\\DIC_S_cropped_gray_pad_0.tiff'
+psfdi_name = 'C:\\Users\\potterst1\\Desktop\\Repositories\\BitBucket\\dic\\data\\DOA_cropped_gray_pad_0.tiff'
+#dic_name = '/workspace/stpotter/git/bitbucket/dic/data/DIC_S_cropped_gray_pad_0.tiff'
+#psfdi_name = '/workspace/stpotter/git/bitbucket/dic/data/DOSA_cropped_gray_pad_0.tiff'
 def_image = cv2.imread(dic_name, -1)  # Read in image 'as is'
 
 # Translate image
@@ -84,12 +86,12 @@ ref_image = image_processing.im_warp(def_image, warp)
 subregion_indices = np.array([200, 300, 200, 300])
 
 # Control Points
-rowmin = subregion_indices[-2:].min()
-rowmax = subregion_indices[-2:].max()
-colmin = subregion_indices[:2].min()
-colmax = subregion_indices[:2].max()
-x = np.linspace(colmin, colmax, 4)
-y = np.linspace(rowmin, rowmax, 4)
+rowmin_index = subregion_indices[-2:].min()
+rowmax_index = subregion_indices[-2:].max()
+colmin_index = subregion_indices[:2].min()
+colmax_index = subregion_indices[:2].max()
+x = np.linspace(colmin_index, colmax_index, 4)
+y = np.linspace(rowmin_index, rowmax_index, 4)
 coords = np.zeros((len(x) * len(y), 2))
 k = 0
 for i in range(0, len(x)):
@@ -167,7 +169,6 @@ synth_znssd = analysis.mesh_znssd_bicubic(roi, ref_image.shape, def_image.shape,
 print('Synthetic ZNSSD: {}'.format(synth_znssd))
 print('Synthetic Coordinate Displacements')
 print(synth_coords_disp)
-pdb.set_trace()
 # Visualize synthetic displacement results
 # Set up new surface
 disp_surf = bs.Surface()
@@ -182,11 +183,12 @@ disp_surf.knotvector_v = gutil.generate_knot_vector(disp_surf.degree_v, num_ctrl
 
 disp_surf.delta = 0.01
 fname = name + 'Synth'
-visualize.viz_displacement(ref_image, disp_surf, rowmin, rowmax, colmin, colmax, fname)
+visualize.viz_displacement(ref_image, disp_surf, rowmin_index, rowmax_index, colmin_index, colmax_index, fname)
 
 fname = name + 'Synth'
 # Visualize synthetic deformation results
-visualize.viz_deformation(ref_image, ref_surf, rowmin, rowmax, colmin, colmax, synth_coords_disp, fname)
+visualize.viz_deformation(ref_image, ref_surf, rowmin_index, rowmax_index, colmin_index, colmax_index,
+                          synth_coords_disp, fname)
 
 print('Deformation gradient at center of ROI from synthetic control points')
 print(visualize.def_grad(ref_surf, 0.5, 0.5, synth_coords_disp))
@@ -195,7 +197,8 @@ print(visualize.def_grad(ref_surf, 0.5, 0.5, synth_coords_disp))
 arg_tup = (roi, ref_image.shape, def_image.shape, ref_surf, uv_vals, ref_coeff, def_coeff)
 
 # compute mesh znssd one time and exit if its low enough
-int_disp_vec = analysis.rigid_guess(ref_image, def_image, rowmin, rowmax, colmin, colmax, len(coords))
+int_disp_vec = analysis.rigid_guess(ref_image, def_image, rowmin_index, rowmax_index, colmin_index, colmax_index,
+                                    len(coords))
 
 # compute mesh znssd one time and exit if its low enough
 #pr.enable()
@@ -240,10 +243,11 @@ disp_surf.knotvector_v = gutil.generate_knot_vector(disp_surf.degree_v, num_ctrl
 disp_surf.delta = 0.01
 
 fname = name + 'Min'
-visualize.viz_displacement(ref_image, disp_surf, rowmin, rowmax, colmin, colmax, fname)
+visualize.viz_displacement(ref_image, disp_surf, rowmin_index, rowmax_index, colmin_index, colmax_index, fname)
 # Visualize minimization result deformation
 fname = name + 'Min'
-visualize.viz_deformation(ref_image, ref_surf, rowmin, rowmax, colmin, colmax, coords_disp, fname)
+visualize.viz_deformation(ref_image, ref_surf, rowmin_index, rowmax_index, colmin_index, colmax_index, coords_disp,
+                          fname)
 
 print('Deformation gradient at center of ROI from minimization control points')
 print(visualize.def_grad(ref_surf, 0.5, 0.5, coords_disp))
