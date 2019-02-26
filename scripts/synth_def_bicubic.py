@@ -65,8 +65,8 @@ interp_order = 'cubic'
 # Hard code absolute paths for now. Fix later'
 dic_name = 'C:\\Users\\potterst1\\Desktop\\Repositories\\BitBucket\\dic\\data\\DIC_S_cropped_gray_pad_0.tiff'
 psfdi_name = 'C:\\Users\\potterst1\\Desktop\\Repositories\\BitBucket\\dic\\data\\DOA_cropped_gray_pad_0.tiff'
-dic_name = '/workspace/stpotter/git/bitbucket/dic/data/DIC_S_cropped_gray_pad_0.tiff'
-psfdi_name = '/workspace/stpotter/git/bitbucket/dic/data/DOSA_cropped_gray_pad_0.tiff'
+#dic_name = '/workspace/stpotter/git/bitbucket/dic/data/DIC_S_cropped_gray_pad_0.tiff'
+#psfdi_name = '/workspace/stpotter/git/bitbucket/dic/data/DOSA_cropped_gray_pad_0.tiff'
 def_image = cv2.imread(dic_name, -1)  # Read in image 'as is'
 
 # Translate image
@@ -83,7 +83,7 @@ ref_image = image_processing.im_warp(def_image, warp)
 
 # Specify region of interest
 # Format: [column index for start of X, column index for end of X, row index for start of Y, row index for end of Y]
-subregion_indices = np.array([100, 400, 100, 400])
+subregion_indices = np.array([200, 300, 200, 300])
 
 # Control Points
 rowmin_index = subregion_indices[-2:].min()
@@ -212,6 +212,7 @@ if residual > 1e-6:
 print('Actual Rigid X Displacement: {}'.format(dx))
 print('Actual Rigid Y Displacement: {}'.format(dy))
 print('Mesh Details: {} by {}'.format(num_ctrlpts, num_ctrlpts))
+print('ROI Size: {} by {}'.format(rowmax_index - rowmin_index, colmax_index - colmin_index))
 print('Initial Guess -  X Displacement: {}'.format(int_disp_vec[0]))
 print('Initial Guess - Y Displacement: {}'.format(int_disp_vec[1]))
 
