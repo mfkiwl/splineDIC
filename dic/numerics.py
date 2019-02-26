@@ -133,7 +133,8 @@ def eval_interp_bicubic(coeffs, x, y, shape):
     xar = np.array([1.0, xval, xval ** 2, xval ** 3])
     yar = np.array([1.0, yval, yval ** 2, yval ** 3])
 
-    p = yar @ A @ xar
+    #p = yar @ A @ xar
+    p = xar @ A @ yar
 
     return p
 
