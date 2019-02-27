@@ -39,13 +39,14 @@ pr.disable()
 
 # Parse input
 try:
-    name = sys.argv[1]
-    dx = float(sys.argv[2])
-    dy = float(sys.argv[3])
-    F11 = float(sys.argv[4])
-    F12 = float(sys.argv[5])
-    F21 = float(sys.argv[6])
-    F22 = float(sys.argv[7])
+    system = sys.arg[1]
+    name = sys.argv[2]
+    dx = float(sys.argv[3])
+    dy = float(sys.argv[4])
+    F11 = float(sys.argv[5])
+    F12 = float(sys.argv[6])
+    F21 = float(sys.argv[8])
+    F22 = float(sys.argv[9])
 except IndexError:
     print('Invalid command line arguments')
     sys.exit(1)
@@ -60,10 +61,16 @@ except OSError:
 
 # Read image data
 # Hard code absolute paths for now. Fix later'
-dic_name = 'C:\\Users\\potterst1\\Desktop\\Repositories\\BitBucket\\dic\\data\\DIC_S_cropped_gray_pad_0.tiff'
-psfdi_name = 'C:\\Users\\potterst1\\Desktop\\Repositories\\BitBucket\\dic\\data\\DOA_cropped_gray_pad_0.tiff'
-dic_name = '/workspace/stpotter/git/bitbucket/dic/data/DIC_S_cropped_gray_pad_0.tiff'
-psfdi_name = '/workspace/stpotter/git/bitbucket/dic/data/DOSA_cropped_gray_pad_0.tiff'
+if system == 'windows':
+    dic_name = 'C:\\Users\\potterst1\\Desktop\\Repositories\\BitBucket\\dic\\data\\DIC_S_cropped_gray_pad_0.tiff'
+    psfdi_name = 'C:\\Users\\potterst1\\Desktop\\Repositories\\BitBucket\\dic\\data\\DOA_cropped_gray_pad_0.tiff'
+elif system == 'unix':
+    dic_name = '/workspace/stpotter/git/bitbucket/dic/data/DIC_S_cropped_gray_pad_0.tiff'
+    psfdi_name = '/workspace/stpotter/git/bitbucket/dic/data/DOSA_cropped_gray_pad_0.tiff'
+else:
+    print('Unclear system specification')
+    sys.exit(1)
+
 def_image = cv2.imread(dic_name, -1)  # Read in image 'as is'
 
 # Translate image
