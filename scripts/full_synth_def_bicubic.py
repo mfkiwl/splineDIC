@@ -40,13 +40,14 @@ pr.disable()
 # Parse input
 try:
     system = sys.argv[1]
-    name = sys.argv[2]
-    dx = float(sys.argv[3])
-    dy = float(sys.argv[4])
-    F11 = float(sys.argv[5])
-    F12 = float(sys.argv[6])
-    F21 = float(sys.argv[7])
-    F22 = float(sys.argv[8])
+    data = sys.argv[2]
+    name = sys.argv[3]
+    dx = float(sys.argv[4])
+    dy = float(sys.argv[5])
+    F11 = float(sys.argv[6])
+    F12 = float(sys.argv[7])
+    F21 = float(sys.argv[8])
+    F22 = float(sys.argv[9])
 except IndexError:
     print('Invalid command line arguments')
     sys.exit(1)
@@ -66,12 +67,18 @@ if system == 'windows':
     psfdi_name = 'C:\\Users\\potterst1\\Desktop\\Repositories\\BitBucket\\dic\\data\\DOA_cropped_gray_pad_0.tiff'
 elif system == 'unix':
     dic_name = '/workspace/stpotter/git/bitbucket/dic/data/DIC_S_cropped_gray_pad_0.tiff'
-    psfdi_name = '/workspace/stpotter/git/bitbucket/dic/data/DOSA_cropped_gray_pad_0.tiff'
+    psfdi_name = '/workspace/stpotter/git/bitbucket/dic/data/DOA_cropped_gray_pad_0.tiff'
 else:
     print('Unclear system specification')
     sys.exit(1)
 
-def_image = cv2.imread(dic_name, -1)  # Read in image 'as is'
+if data == 'dic':
+    def_image = cv2.imread(dic_name, -1)  # Read in image 'as is'
+elif data == 'psfdi':
+    def_image = cv2.imread(psfdi_name, -1)  # Read in image 'as is'
+else:
+    print('Unclear image data type')
+    sys.exit(1)
 
 # Translate image
 F = np.array([[F11, F12],
