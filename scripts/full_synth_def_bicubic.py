@@ -39,14 +39,14 @@ pr.disable()
 
 # Parse input
 try:
-    system = sys.arg[1]
+    system = sys.argv[1]
     name = sys.argv[2]
     dx = float(sys.argv[3])
     dy = float(sys.argv[4])
     F11 = float(sys.argv[5])
     F12 = float(sys.argv[6])
-    F21 = float(sys.argv[8])
-    F22 = float(sys.argv[9])
+    F21 = float(sys.argv[7])
+    F22 = float(sys.argv[8])
 except IndexError:
     print('Invalid command line arguments')
     sys.exit(1)
@@ -97,7 +97,7 @@ j = 0
 for row in range(0, 450):
     for col in range(0, 450):
         # New pt (x, y)
-        pt = F @ np.array([col, row])
+        pt = F @ np.array([col, row]) + np.array([dx, dy])
         val = numerics.eval_interp_bicubic(def_coeff, pt[0], pt[1], def_image.shape)
         ref_sub_image[i, j] = val
         j += 1
@@ -106,7 +106,7 @@ for row in range(0, 450):
 
 # Specify region of interest
 # Format: [column index for start of X, column index for end of X, row index for start of Y, row index for end of Y]
-subregion_indices = np.array([150, 350, 150, 350])
+subregion_indices = np.array([200, 300, 200, 300])
 
 # Control Points
 rowmin_index = subregion_indices[-2:].min()
