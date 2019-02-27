@@ -84,13 +84,13 @@ for row in range(0, 450):
         pt = F @ np.array([col, row])
         val = numerics.eval_interp_bicubic(def_coeff, pt[0], pt[1], def_image.shape)
         ref_sub_image[i, j] = val
-        j+=1
-    j=0
-    i+=1
+        j += 1
+    j = 0
+    i += 1
 
 # Specify region of interest
 # Format: [column index for start of X, column index for end of X, row index for start of Y, row index for end of Y]
-subregion_indices = np.array([200, 300, 200, 300])
+subregion_indices = np.array([200, 250, 200, 250])
 
 # Control Points
 rowmin_index = subregion_indices[-2:].min()
@@ -160,10 +160,52 @@ for i in range(len(synth_coords)):
 # Compute synthetic control point displacements
 synth_coords_disp = synth_coords - coords
 
-print(synth_coords_disp)
-
 # Compute znssd between synthetic and ref coordinates
-synth_znssd = analysis.mesh_znssd_bicubic(roi, ref_sub_image.shape, def_sub_image.shape, ref_surf, uv_vals, ref_sub_coeff,
-                                          def_sub_coeff, synth_coords_disp)
+synth_znssd = analysis.mesh_znssd_bicubic(roi, ref_sub_image.shape, def_sub_image.shape, ref_surf, uv_vals,
+                                          ref_sub_coeff, def_sub_coeff, synth_coords_disp)
 
-print('ZNSSD: {}'.format(synth_znssd))
+# Print the synthetic info to stdout
+print('Synthetic ZNSSD: {}'.format(synth_znssd))
+print('Synthetic Coordinate Displacements')
+print(synth_coords_disp)
+print('Deformation gradient at center of ROI from synthetic control points')
+print(visualize.def_grad(ref_surf, 0.5, 0.5, synth_coords_disp))
+
+# Wrap minimization arguments into a tuple
+arg_tup = (roi, ref_sub_image.shape, def_sub_image.shape, ref_surf, uv_vals, ref_sub_coeff, def_sub_coeff)
+
+# compute mesh znssd one time and exit if its low enough
+int_disp_vec = analysis.rigid_guess(ref_sub_image, def_sub_image, rowmin_index, rowmax_index, colmin_index,
+                                    colmax_index, len(coords))
+
+# compute mesh znssd one time and exit if its low enough
+#pr.enable()
+
+residual = analysis.scipy_minfun_bicubic(int_disp_vec, *arg_tup)
+
+if residual > 1e-6:
+    result = sciopt.minimize(analysis.scipy_minfun_bicubic, int_disp_vec, args=arg_tup, method='L-BFGS-B', jac='2-point',
+                             bounds=None, options={'maxiter': 30, 'disp': True})
+
+print('Actual Rigid X Displacement: {}'.format(dx))
+print('Actual Rigid Y Displacement: {}'.format(dy))
+print('Mesh Details: {} by {}'.format(num_ctrlpts, num_ctrlpts))
+print('ROI Size: {} by {}'.format(rowmax_index - rowmin_index, colmax_index - colmin_index))
+print('Initial Guess -  X Displacement: {}'.format(int_disp_vec[0]))
+print('Initial Guess - Y Displacement: {}'.format(int_disp_vec[1]))
+
+if residual > 1e-6:
+    print('residual')
+    print(result.fun)
+    coords_disp = np.column_stack((result.x[::2], result.x[1::2]))
+    print('final control point displacements')
+    print(coords_disp)
+else:
+    print('residual')
+    print(residual)
+    coords_disp = np.column_stack((int_disp_vec[::2], int_disp_vec[1::2]))
+    print('final control point displacement')
+    print(coords_disp)
+
+print('Deformation gradient at center of ROI from minimization control points')
+print(visualize.def_grad(ref_surf, 0.5, 0.5, coords_disp))
