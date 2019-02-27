@@ -439,10 +439,15 @@ def mesh_znssd_spline(ref_image, def_image, ref_mesh, uv_vals, ref_coeff, def_co
 
     # Loop over these matrices and compute ZNSSD (could be much faster)
     znssd = 0.0
-
+    '''
     for i in range(0, rowmax):
         for j in range(0, colmax):
             znssd += np.square((f_mesh[i, j] - fmean) / fstddev - (g_mesh[i, j] - gmean) / gstddev)
+    '''
+    fval = 1 / fstddev * (f_mesh - np.ones(f_mesh.shape) * fmean)
+    gval = 1 / gstddev * (g_mesh - np.ones(g_mesh.shape) * gmean)
+
+    znssd = np.square(fval, gval)
 
     return znssd
 
