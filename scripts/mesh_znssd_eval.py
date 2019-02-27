@@ -112,7 +112,7 @@ for row in range(0, 450):
 
 # Specify region of interest
 # Format: [column index for start of X, column index for end of X, row index for start of Y, row index for end of Y]
-subregion_indices = np.array([200, 300, 200, 300])
+subregion_indices = np.array([150, 350, 150, 350])
 
 # Control Points
 rowmin_index = subregion_indices[-2:].min()
