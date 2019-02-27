@@ -39,15 +39,24 @@ pr.disable()
 
 # Parse input
 try:
-    dx = float(sys.argv[1])
-    dy = float(sys.argv[2])
-    F11 = float(sys.argv[3])
-    F12 = float(sys.argv[4])
-    F21 = float(sys.argv[5])
-    F22 = float(sys.argv[6])
+    name = sys.argv[1]
+    dx = float(sys.argv[2])
+    dy = float(sys.argv[3])
+    F11 = float(sys.argv[4])
+    F12 = float(sys.argv[5])
+    F21 = float(sys.argv[6])
+    F22 = float(sys.argv[7])
 except IndexError:
     print('Invalid command line arguments')
     sys.exit(1)
+
+# Change to output directory
+start = os.getcwd()
+try:
+    os.chdir(name)
+except OSError:
+    os.makedirs(name)
+    os.chdir(name)
 
 # Read image data
 # Hard code absolute paths for now. Fix later'
@@ -209,3 +218,22 @@ else:
 
 print('Deformation gradient at center of ROI from minimization control points')
 print(visualize.def_grad(ref_surf, 0.5, 0.5, coords_disp))
+
+# Write outputs
+fname = name + 'synthdef.txt'
+f = open(fname, 'w')
+f.write('Mesh Coordinates\n')
+f.write('X Y dX dY\n')
+for i in range(0, len(coords)):
+    f.write('{0} {1} {2} {3} \n'.format(coords[i, 0], coords[i, 1], synth_coords_disp[i, 0], synth_coords_disp[i, 1]))
+
+f.close()
+
+fname = name + 'mindef.txt'
+f = open(fname, 'w')
+f.write('Mesh Coordinates\n')
+f.write('X Y dX dY\n')
+for i in range(0, len(coords)):
+    f.write('{0} {1} {2} {3} \n'.format(coords[i, 0], coords[i, 1], coords_disp[i, 0], coords_disp[i, 1]))
+
+f.close()
