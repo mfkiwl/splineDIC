@@ -188,6 +188,8 @@ synth_znssd = analysis.mesh_znssd_bicubic(roi, ref_sub_image.shape, def_sub_imag
                                           ref_sub_coeff, def_sub_coeff, synth_coords_disp)
 
 # Print the synthetic info to stdout
+data_out = 'Using image data from ' + data
+print(data_out)
 print('Synthetic ZNSSD: {}'.format(synth_znssd))
 print('Synthetic Coordinate Displacements')
 print(synth_coords_disp)
