@@ -65,6 +65,8 @@ def setup_surf(subregion_indices):
     :rtype: tuple
     """
 
+    # TODO: type check size, shape, and type of inputs
+
     # Control Points
     rowmin_index = subregion_indices[-2:].min()
     rowmax_index = subregion_indices[-2:].max()
@@ -98,7 +100,6 @@ def setup_surf(subregion_indices):
 
     # Get min and max row values from min/max reference ctrlpt node y values
     rowmax = (np.max(coords[:, 1]) - np.min(coords[:, 1])).astype('int')
-
 
     uv_vals = np.zeros((2, rowmax, colmax))
     for i in range(0, rowmax):
@@ -174,6 +175,45 @@ def parameterize_pixels(ref_image, ref_mesh):
             uv_vals[1, i, j] = v
 
     return uv_vals
+
+
+def ref_mesh_qoi(ref_mesh, uv_vals, ref_coeffs):
+
+    """
+    Compute the matrix of pixel values as well as their mean and standard deviation for the reference mesh
+
+    :param ref_mesh: Reference mesh object
+    :type ref_mesh: B Spline surface object
+    :param uv_vals: Array of pixel uv parameters in region of interest. Shape (2, row, col)
+    :type uv_vals: ndarray
+    :param ref_coeffs: Bicubic coefficients of reference image. Shape [(rows - 1) * (cols - 1), 4, 4]
+    :type ref_coeffs: ndarray
+    :return: tuple of quantities (ref pixel values (f), f mean, f standard deviation)
+    :rtype: tuple
+    """
+
+    # Get shape of region of interest
+    shape = uv_vals.shape[1:]
+    rowmax = shape[0]
+    colmax = shape[1]
+
+    f_mesh = np.zeros(shape)
+    # TODO: Vectorize this?
+    for i in range(0, rowmax):
+        for j in range(0, colmax):
+            u_val = uv_vals[0, i, j]
+            v_val = uv_vals[1, i, j]
+
+            # Compute the displacement by interpolating
+            pt = ref_mesh.surfpt(u_val, v_val)
+
+            f_mesh[i, j] = numerics.eval_interp_bicubic(ref_coeffs, pt[0], pt[1], shape)
+
+    f_mean = np.mean(f_mesh)
+
+    f_stddev = np.std(f_mesh)
+
+    return f_mesh, f_mesh, f_stddev
 
 
 def deform_mesh(ref_mesh, cpts_disp):
