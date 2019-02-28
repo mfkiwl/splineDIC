@@ -47,12 +47,71 @@ def mesh(ref_cpts, degree=3):
     surf.knotvector_u = gutil.generate_knot_vector(surf.degree_u, num_ctrlpts)
     surf.knotvector_v = gutil.generate_knot_vector(surf.degree_v, num_ctrlpts)
 
-    surf.delta = 0.001
+    surf.delta = 0.01
 
     return surf
 
 
-# TODO: Rewrite this and just use projection and Newton's methods
+def setup_surf(subregion_indices):
+
+    """
+    Set up analysis mesh surface and array of uv pixel parameters based on the indices of the region of interest.
+    Return a surface object and numpy array of uv pixel parameters
+
+    :param subregion_indices: Array of region of interest pixel indices. Format is
+    [column index for start of X, column index for end of X, row index for start of Y, row index for end of Y]
+    :type subregion_indices: ndarray
+    :return: tuple containing (surf object, uv pixel parameters ndarray)
+    :rtype: tuple
+    """
+
+    # Control Points
+    rowmin_index = subregion_indices[-2:].min()
+    rowmax_index = subregion_indices[-2:].max()
+    colmin_index = subregion_indices[:2].min()
+    colmax_index = subregion_indices[:2].max()
+    x = np.linspace(colmin_index, colmax_index, 4)
+    y = np.linspace(rowmin_index, rowmax_index, 4)
+    coords = np.zeros((len(x) * len(y), 2))
+    k = 0
+    for i in range(0, len(x)):
+        for j in range(0, len(y)):
+            coords[k, :] = np.array([x[i], y[j]])
+            k += 1
+
+    # Get surface
+    surf = mesh(coords)
+
+    # TODO: MAKE THIS A FUNCTION WITH OPTION TO CALL PIXEL PARAMETERIZATION
+    #
+    # Compute ROI and ROI uv values
+    # Get min and max column values from min/max reference ctrlpt node x values
+    # min_col_index = np.min(coords[:, 0]).astype('int')
+    max_col_index = np.max(coords[:, 0]).astype('int')
+
+    # Get maximum column number for sub image array from ref ctrlpt node x values
+    colmax = (np.max(coords[:, 0]) - np.min(coords[:, 0])).astype('int')
+
+    # Get min and max column values from min/max reference ctrlpt node x values
+    min_row_index = np.min(coords[:, 1]).astype('int')
+    max_row_index = np.max(coords[:, 1]).astype('int')
+
+    # Get min and max row values from min/max reference ctrlpt node y values
+    rowmax = (np.max(coords[:, 1]) - np.min(coords[:, 1])).astype('int')
+
+
+    uv_vals = np.zeros((2, rowmax, colmax))
+    for i in range(0, rowmax):
+        for j in range(0, colmax):
+            uv_vals[0, i, j] = j / colmax
+            uv_vals[1, i, j] = i / rowmax
+
+    return surf, uv_vals
+
+
+# TODO: Rewrite this and just use projection and Newton's methods or delete?
+
+
 def parameterize_pixels(ref_image, ref_mesh):
     """
     For each pixel in the reference image region of interest, compute the nearest u,v coordinate pair in the
