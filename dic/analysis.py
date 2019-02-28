@@ -41,7 +41,7 @@ def mesh(ref_cpts, degree=3):
     surf.degree_v = degree
 
     # Set control points
-    surf.set_ctrlpts(ref_cpts, num_ctrlpts, num_ctrlpts)
+    surf.set_ctrlpts(ref_cpts.tolist(), num_ctrlpts, num_ctrlpts)
 
     # Set knots
     surf.knotvector_u = gutil.generate_knot_vector(surf.degree_u, num_ctrlpts)
