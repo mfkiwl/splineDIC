@@ -15,20 +15,14 @@ import os
 sys.path.extend(['C:\\Users\\potterst1\\Desktop\Repositories\BitBucket\dic',
                  'C:/Users/potterst1/Desktop/Repositories/BitBucket/dic'])
 sys.path.extend(['/workspace/stpotter/git/bitbucket/dic'])
-import warnings
-from dic import nurbs
-from dic import fileIO
 from dic import numerics
 from dic import analysis
-from dic import image_processing
 from dic import visualize
 import cv2
-from matplotlib import pyplot as plt
 import numpy as np
 from geomdl import BSpline as bs
 from geomdl import utilities as gutil
 import scipy.optimize as sciopt
-import scipy.signal as sig
 
 # Debugging
 import cProfile as profile
@@ -113,67 +107,23 @@ for row in range(0, 450):
 
 # Specify region of interest
 # Format: [column index for start of X, column index for end of X, row index for start of Y, row index for end of Y]
+# TODO: Is this format the best or should it be row column and then map appropriately? Depends on UI
 subregion_indices = np.array([200, 300, 200, 300])
 
-# Control Points
-rowmin_index = subregion_indices[-2:].min()
-rowmax_index = subregion_indices[-2:].max()
-colmin_index = subregion_indices[:2].min()
-colmax_index = subregion_indices[:2].max()
-x = np.linspace(colmin_index, colmax_index, 4)
-y = np.linspace(rowmin_index, rowmax_index, 4)
-coords = np.zeros((len(x) * len(y), 2))
-k = 0
-for i in range(0, len(x)):
-    for j in range(0, len(y)):
-        coords[k, :] = np.array([x[i], y[j]])
-        k += 1
+# Compute some items to use for output. Will refactor later
 
-# Surface
-ref_surf = bs.Surface()
-
-ref_surf.degree_u = 3
-ref_surf.degree_v = 3
-
+# Setup mesh and uv values
+ref_surf, uv_vals, coords, indices = analysis.setup_surf(subregion_indices)
 num_ctrlpts = np.sqrt(len(coords)).astype('int')
-
-ref_surf.set_ctrlpts(coords.tolist(), num_ctrlpts, num_ctrlpts)
-
-ref_surf.knotvector_u = gutil.generate_knot_vector(ref_surf.degree_u, num_ctrlpts)
-ref_surf.knotvector_v = gutil.generate_knot_vector(ref_surf.degree_v, num_ctrlpts)
-
-ref_surf.delta = 0.01
-
-#TODO: MAKE THIS A FUNCTION
-# Compute ROI and ROI uv values
-# Get min and max column values from min/max reference ctrlpt node x values
-min_col_index = np.min(coords[:, 0]).astype('int')
-max_col_index = np.max(coords[:, 0]).astype('int')
-
-# Get maximum column number for sub image array from ref ctrlpt node x values
-colmax = (np.max(coords[:, 0]) - np.min(coords[:, 0])).astype('int')
-
-# Get min and max column values from min/max reference ctrlpt node x values
-min_row_index = np.min(coords[:, 1]).astype('int')
-max_row_index = np.max(coords[:, 1]).astype('int')
-
-# Get min and max row values from min/max reference ctrlpt node y values
-rowmax = (np.max(coords[:, 1]) - np.min(coords[:, 1])).astype('int')
-
-# Set reference image mesh over image
-roi = ref_sub_image[min_row_index:max_row_index, min_col_index:max_col_index]
-
-uv_vals = np.zeros((2, )+ roi.shape)
-for i in range(0, rowmax):
-    for j in range(0, colmax):
-        uv_vals[0, i, j] = j / colmax
-        uv_vals[1, i, j] = i / rowmax
-
-#TODO: Up to here
 
 # Get interpolation coefficients
 ref_sub_coeff = numerics.image_interp_bicubic(ref_sub_image)
 def_sub_coeff = numerics.image_interp_bicubic(def_sub_image)
+
+# TODO: Add type checking
+
+# Compute reference mesh quantities of interest (array, mean, standard deviation)
+f_mesh, f_mean, f_stddev = analysis.ref_mesh_qoi(ref_surf, uv_vals, ref_sub_coeff, ref_sub_image.shape)
 
 # Test synthetically deformed control points
 synth_coords = np.zeros((len(coords), 2))
@@ -184,8 +134,8 @@ for i in range(len(synth_coords)):
 synth_coords_disp = synth_coords - coords
 
 # Compute znssd between synthetic and ref coordinates
-synth_znssd = analysis.mesh_znssd(roi, ref_sub_image.shape, def_sub_image.shape, ref_surf, uv_vals,
-                                  ref_sub_coeff, def_sub_coeff, synth_coords_disp)
+synth_znssd = analysis.mesh_znssd(f_mesh, f_mean, f_stddev, def_sub_image.shape, ref_surf, uv_vals, def_sub_coeff,
+                                  synth_coords_disp)
 
 # Print the synthetic info to stdout
 data_out = 'Using image data from ' + data
@@ -197,11 +147,11 @@ print('Deformation gradient at center of ROI from synthetic control points')
 print(visualize.def_grad(ref_surf, 0.5, 0.5, synth_coords_disp))
 
 # Wrap minimization arguments into a tuple
-arg_tup = (roi, ref_sub_image.shape, def_sub_image.shape, ref_surf, uv_vals, ref_sub_coeff, def_sub_coeff)
+arg_tup = (f_mesh, f_mean, f_stddev, def_sub_image.shape, ref_surf, uv_vals, def_sub_coeff)
 
 # compute mesh znssd one time and exit if its low enough
-int_disp_vec = analysis.rigid_guess(ref_sub_image, def_sub_image, rowmin_index, rowmax_index, colmin_index,
-                                    colmax_index, len(coords))
+int_disp_vec = analysis.rigid_guess(ref_sub_image, def_sub_image, indices[0], indices[1], indices[2], indices[3],
+                                    len(coords))
 
 # compute mesh znssd one time and exit if its low enough
 #pr.enable()
@@ -215,7 +165,7 @@ if residual > 1e-6:
 print('Actual Rigid X Displacement: {}'.format(dx))
 print('Actual Rigid Y Displacement: {}'.format(dy))
 print('Mesh Details: {} by {}'.format(num_ctrlpts, num_ctrlpts))
-print('ROI Size: {} by {}'.format(rowmax_index - rowmin_index, colmax_index - colmin_index))
+print('ROI Size: {} by {}'.format(indices[1] - indices[0], indices[3] - indices[2]))
 print('Initial Guess -  X Displacement: {}'.format(int_disp_vec[0]))
 print('Initial Guess - Y Displacement: {}'.format(int_disp_vec[1]))
 
