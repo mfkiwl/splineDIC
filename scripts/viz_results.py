@@ -161,4 +161,24 @@ fname = dsetname + 'Synth'
 visualize.viz_deformation(image, ref_surf, rowmin_index, rowmax_index, colmin_index, colmax_index,
                           synth_coords_disp, fname)
 
+# Visualize minimization displacement results
+min_coords_disp = min_data[:, 2:]
+# Set up new surface
+disp_surf = bs.Surface()
 
+disp_surf.degree_u = 3
+disp_surf.degree_v = 3
+
+disp_surf.set_ctrlpts(min_coords_disp.tolist(), num_ctrlpts, num_ctrlpts)
+
+disp_surf.knotvector_u = gutil.generate_knot_vector(disp_surf.degree_u, num_ctrlpts)
+disp_surf.knotvector_v = gutil.generate_knot_vector(disp_surf.degree_v, num_ctrlpts)
+
+disp_surf.delta = 0.01
+fname = dsetname + 'Min'
+visualize.viz_displacement(image, disp_surf, rowmin_index, rowmax_index, colmin_index, colmax_index, fname)
+
+fname = dsetname + 'Min'
+# Visualize synthetic deformation results
+visualize.viz_deformation(image, ref_surf, rowmin_index, rowmax_index, colmin_index, colmax_index,
+                          min_coords_disp, fname)
