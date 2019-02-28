@@ -260,24 +260,25 @@ def deform_mesh(ref_mesh, cpts_disp):
     return def_mesh
 
 
-def mesh_znssd(roi, ref_shape, def_shape, ref_mesh, uv_vals, ref_coeff, def_coeff, cpts_disp):
+def mesh_znssd(f_mesh, f_mean, f_stddev, def_shape, ref_mesh, uv_vals, def_coeff, cpts_disp):
+
     """
     Compute the zero normalized sum of square differences over an entire mesh between two images using bicubic
     interpolation
     See Pan et al. Meas Sci Tech 2009 for details.
 
-    :param roi: 2D array of pixels in region of interest in ref image
-    :type roi: ndarray
-    :param ref_shape: reference image shape
-    :type ref_shape: tuple
-    :param def_shape: deformed image shape
+    :param f_mesh: values of reference image in region of interest
+    :type f_mesh: ndarray
+    :param f_mean: mean of reference image values
+    :type f_mean: float
+    :param f_stddev: standard deviation of reference image values
+    :type f_stddev: float
+    ::param def_shape: deformed image shape
     :type def_shape: tuple
     :param ref_mesh: reference state B-spline mesh
     :type ref_mesh: Bspline surface
     :param uv_vals: Array containing u, v parameterization of the pixels in the reference image
     :type uv_vals: ndarray
-    :param ref_coeff: 2D array of bicubic coefficients for reference image
-    :type ref_coeff: ndarray
     :param def_coeff: 2D array of bicubic coefficients for deformed image
     :type def_coeff: ndarray
     :param cpts_disp: control point displacements [delta X, delta Y]
@@ -286,61 +287,14 @@ def mesh_znssd(roi, ref_shape, def_shape, ref_mesh, uv_vals, ref_coeff, def_coef
     :rtyp: float
     """
 
-    # Sanitize input
-    if len(ref_shape) != 2:
-        raise ValueError('Reference image input must be 2d')
-
-    if len(def_shape) != 2:
-        raise ValueError('Deformed image input must be 2d')
-
-    if ref_shape != def_shape:
-        raise ValueError('Images must be the same size')
-
-    # Get ref mesh control points
-    ref_cpts = np.array(ref_mesh.ctrlpts)
-
     # Get def mesh
     def_mesh = deform_mesh(ref_mesh, cpts_disp)
-    '''
-    DO I NEED TO DO THE ROI EXTRACTION EVERY TIME?
-    # Get min and max column values from min/max reference ctrlpt node x values
-    min_col_index = np.min(ref_cpts[:, 0]).astype('int')
-    max_col_index = np.max(ref_cpts[:, 0]).astype('int')
-
-    # Get maximum column number for sub image array from ref ctrlpt node x values
-    colmax = (np.max(ref_cpts[:, 0]) - np.min(ref_cpts[:, 0])).astype('int')
-
-    # Get min and max column values from min/max reference ctrlpt node x values
-    min_row_index = np.min(ref_cpts[:, 1]).astype('int')
-    max_row_index = np.max(ref_cpts[:, 1]).astype('int')
-
-    # Get min and max row values from min/max reference ctrlpt node y values
-    rowmax = (np.max(ref_cpts[:, 1]) - np.min(ref_cpts[:, 1])).astype('int')
-
-    # Set reference image mesh over image
-    f_mesh = ref_image[min_row_index:max_row_index, min_col_index:max_col_index]
-    '''
-    f_mesh = roi
-
-    # Compute mean of this reference image mesh
-    fmean = np.mean(f_mesh)
-
-    # Compute standard deviation this reference image mesh
-    fstddev = np.std(f_mesh)
 
     # For every pixel in f, compute the new location in g
     g_mesh = np.zeros(f_mesh.shape)
 
-    # Check uv_vals have same shape as ref image
-    '''
-    if not uv_vals.shape == ref_image.shape:
-        raise ValueError('u, v parameterization array must be same shape as reference image')
-    if not uv_vals.shape == roi.shape:
-        raise ValueError('u, v parameterization array must be same shape as ROI')
-    '''
-
-    rowmax = roi.shape[0]
-    colmax = roi.shape[1]
+    rowmax = f_mesh.shape[0]
+    colmax = f_mesh.shape[1]
 
     # TODO: Vectorize this?
     for i in range(0, rowmax):
@@ -354,24 +308,24 @@ def mesh_znssd(roi, ref_shape, def_shape, ref_mesh, uv_vals, ref_coeff, def_coef
             g_mesh[i, j] = numerics.eval_interp_bicubic(def_coeff, new_pt[0], new_pt[1], def_shape)
 
     # Compute mean of this deformed image mesh
-    gmean = np.mean(g_mesh)
+    g_mean = np.mean(g_mesh)
 
     # Compute standard deviation of this deformed image mesh
-    gstddev = np.std(g_mesh)
+    g_stddev = np.std(g_mesh)
 
-    # Loop over these matrices and compute ZNSSD (could be much faster)
-    znssd = 0.0
+    # Compute ZNSSD
 
-    for i in range(0, rowmax):
-        for j in range(0, colmax):
-            znssd += np.square((f_mesh[i, j] - fmean) / fstddev - (g_mesh[i, j] - gmean) / gstddev)
+    fval = 1 / f_stddev * (f_mesh - np.ones(f_mesh.shape) * f_mean)
+    gval = 1 / g_stddev * (g_mesh - np.ones(g_mesh.shape) * g_mean)
+
+    znssd = np.sum(np.square(fval - gval))
 
     return znssd
 
 
 def scipy_minfun(disp_vec, *args):
 
-    '''
+    """
     Minimization function for passing to scipy minimize
 
     Assembles solution vector and arguments, then passes to mesh_znssd_bicubic to compute cost
@@ -381,7 +335,7 @@ def scipy_minfun(disp_vec, *args):
     :type disp_vec: ndarray
     :return: scalar value of mesh znssed at the trial displacement vector
     :rtype: float
-    '''
+    """
 
     # Assemble displacement vector
     ctrlpt_disp = np.zeros((int(len(disp_vec) / 2), 2))
