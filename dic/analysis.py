@@ -56,12 +56,12 @@ def setup_surf(subregion_indices):
 
     """
     Set up analysis mesh surface and array of uv pixel parameters based on the indices of the region of interest.
-    Return a surface object and numpy array of uv pixel parameters
+    Return a surface object, numpy array of uv pixel parameters, and numpy array of mesh coordinate locations
 
     :param subregion_indices: Array of region of interest pixel indices. Format is
     [column index for start of X, column index for end of X, row index for start of Y, row index for end of Y]
     :type subregion_indices: ndarray
-    :return: tuple containing (surf object, uv pixel parameters ndarray)
+    :return: tuple containing (surf object, uv pixel parameters ndarray, node coordinate ndarray)
     :rtype: tuple
     """
 
@@ -106,7 +106,7 @@ def setup_surf(subregion_indices):
             uv_vals[0, i, j] = j / colmax
             uv_vals[1, i, j] = i / rowmax
 
-    return surf, uv_vals
+    return surf, uv_vals, coords
 
 
 # TODO: Rewrite this and just use projection and Newton's methods or delete?
