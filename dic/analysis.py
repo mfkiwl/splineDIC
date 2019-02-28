@@ -177,7 +177,7 @@ def parameterize_pixels(ref_image, ref_mesh):
     return uv_vals
 
 
-def ref_mesh_qoi(ref_mesh, uv_vals, ref_coeffs):
+def ref_mesh_qoi(ref_mesh, uv_vals, ref_coeffs, ref_image_shape):
 
     """
     Compute the matrix of pixel values as well as their mean and standard deviation for the reference mesh
@@ -188,6 +188,8 @@ def ref_mesh_qoi(ref_mesh, uv_vals, ref_coeffs):
     :type uv_vals: ndarray
     :param ref_coeffs: Bicubic coefficients of reference image. Shape [(rows - 1) * (cols - 1), 4, 4]
     :type ref_coeffs: ndarray
+    :param ref_image_shape: shape of reference image. Used to indec through reference coefficients.
+    :type ref_image_shape: tuple
     :return: tuple of quantities (ref pixel values (f), f mean, f standard deviation)
     :rtype: tuple
     """
@@ -207,13 +209,13 @@ def ref_mesh_qoi(ref_mesh, uv_vals, ref_coeffs):
             # Compute the displacement by interpolating
             pt = ref_mesh.surfpt(u_val, v_val)
 
-            f_mesh[i, j] = numerics.eval_interp_bicubic(ref_coeffs, pt[0], pt[1], shape)
+            f_mesh[i, j] = numerics.eval_interp_bicubic(ref_coeffs, pt[0], pt[1], ref_image_shape)
 
     f_mean = np.mean(f_mesh)
 
     f_stddev = np.std(f_mesh)
 
-    return f_mesh, f_mesh, f_stddev
+    return f_mesh, f_mean, f_stddev
 
 
 def deform_mesh(ref_mesh, cpts_disp):
