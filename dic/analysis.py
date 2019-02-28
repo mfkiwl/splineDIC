@@ -159,7 +159,7 @@ def deform_mesh(ref_mesh, cpts_disp):
     return def_mesh
 
 
-def mesh_znssd_bicubic(roi, ref_shape, def_shape, ref_mesh, uv_vals, ref_coeff, def_coeff, cpts_disp):
+def mesh_znssd(roi, ref_shape, def_shape, ref_mesh, uv_vals, ref_coeff, def_coeff, cpts_disp):
     """
     Compute the zero normalized sum of square differences over an entire mesh between two images using bicubic
     interpolation
@@ -268,7 +268,7 @@ def mesh_znssd_bicubic(roi, ref_shape, def_shape, ref_mesh, uv_vals, ref_coeff, 
     return znssd
 
 
-def scipy_minfun_bicubic(disp_vec, *args):
+def scipy_minfun(disp_vec, *args):
 
     '''
     Minimization function for passing to scipy minimize
@@ -289,7 +289,7 @@ def scipy_minfun_bicubic(disp_vec, *args):
         ctrlpt_disp[k, :] = np.array([disp_vec[i], disp_vec[i + 1]])
 
     # Call znssd with defaults on all keyword params. This is slow, but okay for now
-    znssd = mesh_znssd_bicubic(*args, ctrlpt_disp)
+    znssd = mesh_znssd(*args, ctrlpt_disp)
 
     return znssd
 

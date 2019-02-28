@@ -184,8 +184,8 @@ for i in range(len(synth_coords)):
 synth_coords_disp = synth_coords - coords
 
 # Compute znssd between synthetic and ref coordinates
-synth_znssd = analysis.mesh_znssd_bicubic(roi, ref_sub_image.shape, def_sub_image.shape, ref_surf, uv_vals,
-                                          ref_sub_coeff, def_sub_coeff, synth_coords_disp)
+synth_znssd = analysis.mesh_znssd(roi, ref_sub_image.shape, def_sub_image.shape, ref_surf, uv_vals,
+                                  ref_sub_coeff, def_sub_coeff, synth_coords_disp)
 
 # Print the synthetic info to stdout
 data_out = 'Using image data from ' + data
@@ -206,10 +206,10 @@ int_disp_vec = analysis.rigid_guess(ref_sub_image, def_sub_image, rowmin_index, 
 # compute mesh znssd one time and exit if its low enough
 #pr.enable()
 
-residual = analysis.scipy_minfun_bicubic(int_disp_vec, *arg_tup)
+residual = analysis.scipy_minfun(int_disp_vec, *arg_tup)
 
 if residual > 1e-6:
-    result = sciopt.minimize(analysis.scipy_minfun_bicubic, int_disp_vec, args=arg_tup, method='L-BFGS-B', jac='2-point',
+    result = sciopt.minimize(analysis.scipy_minfun, int_disp_vec, args=arg_tup, method='L-BFGS-B', jac='2-point',
                              bounds=None, options={'maxiter': 30, 'disp': True})
 
 print('Actual Rigid X Displacement: {}'.format(dx))
