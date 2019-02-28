@@ -56,12 +56,13 @@ def setup_surf(subregion_indices):
 
     """
     Set up analysis mesh surface and array of uv pixel parameters based on the indices of the region of interest.
-    Return a surface object, numpy array of uv pixel parameters, and numpy array of mesh coordinate locations
+    Return a surface object, numpy array of uv pixel parameters, numpy array of mesh coordinate locations, and
+    list of roi indices
 
     :param subregion_indices: Array of region of interest pixel indices. Format is
     [column index for start of X, column index for end of X, row index for start of Y, row index for end of Y]
     :type subregion_indices: ndarray
-    :return: tuple containing (surf object, uv pixel parameters ndarray, node coordinate ndarray)
+    :return: tuple containing (surf object, uv pixel parameters ndarray, node coordinate ndarray, roi indices list)
     :rtype: tuple
     """
 
@@ -88,7 +89,7 @@ def setup_surf(subregion_indices):
     #
     # Compute ROI and ROI uv values
     # Get min and max column values from min/max reference ctrlpt node x values
-    # min_col_index = np.min(coords[:, 0]).astype('int')
+    min_col_index = np.min(coords[:, 0]).astype('int')
     max_col_index = np.max(coords[:, 0]).astype('int')
 
     # Get maximum column number for sub image array from ref ctrlpt node x values
@@ -107,7 +108,9 @@ def setup_surf(subregion_indices):
             uv_vals[0, i, j] = j / colmax
             uv_vals[1, i, j] = i / rowmax
 
-    return surf, uv_vals, coords
+    indices = [min_row_index, max_row_index, min_col_index, max_col_index]
+
+    return surf, uv_vals, coords, indices
 
 
 # TODO: Rewrite this and just use projection and Newton's methods or delete?
