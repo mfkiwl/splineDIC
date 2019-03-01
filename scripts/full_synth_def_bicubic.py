@@ -157,10 +157,12 @@ int_disp_vec = analysis.rigid_guess(ref_sub_image, def_sub_image, indices[0], in
 #pr.enable()
 
 residual = analysis.scipy_minfun(int_disp_vec, *arg_tup)
+# minoptions = {'maxiter': 30, 'disp': True}
+minpotions = {'disp': True}
 
 if residual > 1e-6:
     result = sciopt.minimize(analysis.scipy_minfun, int_disp_vec, args=arg_tup, method='L-BFGS-B', jac='2-point',
-                             bounds=None, options={'maxiter': 30, 'disp': True})
+                             bounds=None, options=minoptions)
 
 print('Actual Rigid X Displacement: {}'.format(dx))
 print('Actual Rigid Y Displacement: {}'.format(dy))
