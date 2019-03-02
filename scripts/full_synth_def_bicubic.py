@@ -36,18 +36,25 @@ try:
     system = sys.argv[1]
     data = sys.argv[2]
     name = sys.argv[3]
-    dx = float(sys.argv[4])
-    dy = float(sys.argv[5])
-    F11 = float(sys.argv[6])
-    F12 = float(sys.argv[7])
-    F21 = float(sys.argv[8])
-    F22 = float(sys.argv[9])
+    maxiterations = int(sys.argv[4])
+    dx = float(sys.argv[5])
+    dy = float(sys.argv[6])
+    F11 = float(sys.argv[7])
+    F12 = float(sys.argv[8])
+    F21 = float(sys.argv[9])
+    F22 = float(sys.argv[10])
 except IndexError:
     print('Invalid command line arguments')
     sys.exit(1)
 
 # Change to output directory
 start = os.getcwd()
+dirname = str(maxiterations) + 'Iters'
+try:
+    os.chdir(dirname)
+except: OSError:
+    os.makedirs(dirname)
+    os.chdir(dirname)
 try:
     os.chdir(name)
 except OSError:
@@ -157,8 +164,7 @@ int_disp_vec = analysis.rigid_guess(ref_sub_image, def_sub_image, indices[0], in
 #pr.enable()
 
 residual = analysis.scipy_minfun(int_disp_vec, *arg_tup)
-# minoptions = {'maxiter': 30, 'disp': True}
-minoptions = {'disp': True}
+minoptions = {'maxiter': 30, 'disp': False}
 
 if residual > 1e-6:
     result = sciopt.minimize(analysis.scipy_minfun, int_disp_vec, args=arg_tup, method='L-BFGS-B', jac='2-point',
