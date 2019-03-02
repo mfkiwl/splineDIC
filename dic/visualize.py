@@ -277,7 +277,7 @@ def viz_deformation(ref_image, ref_surf, rowmin, rowmax, colmin, colmax, coords_
             F21[i, j] = F[1, 0]
             F22[i, j] = F[1, 1]
 
-        # Display
+    # Display
     fig, ((ax0, ax1), (ax2, ax3)) = plt.subplots(2, 2, figsize=(15, 10))
 
     im0 = ax0.imshow(ref_image, cmap='gray')
