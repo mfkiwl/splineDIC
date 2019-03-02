@@ -52,7 +52,7 @@ start = os.getcwd()
 dirname = str(maxiterations) + 'Iters'
 try:
     os.chdir(dirname)
-except: OSError:
+except OSError:
     os.makedirs(dirname)
     os.chdir(dirname)
 try:
