@@ -238,7 +238,7 @@ for i in range(rowmin_index, rowmax_index):
     for j in range(colmin_index, colmax_index):
         u_val = (j - colmin_index) / (colmax_index - colmin_index)
         v_val = (i - rowmin_index) / (rowmax_index - rowmin_index)
-        F_diff = visualize.deg_grad(ref_surf, u_val, v_val, synth_coords_disp) - visualize.def_grad(ref_surf, u_val, v_val, min_coords_disp)
+        F_diff = visualize.def_grad(ref_surf, u_val, v_val, synth_coords_disp) - visualize.def_grad(ref_surf, u_val, v_val, min_coords_disp)
         F11_diff[i, j] = F_diff[0, 0]
         F12_diff[i, j] = F_diff[0, 1]
         F21_diff[i, j] = F_diff[1, 0]
@@ -296,10 +296,10 @@ F12_diff_mean = np.nanmean(F12_diff)
 F21_diff_mean = np.nanmean(F21_diff)
 F22_diff_mean = np.nanmean(F22_diff)
 
-F11_SEM = stats.sem(F11_diff, axis=None)
-F12_SEM = stats.sem(F12_diff, axis=None)
-F21_SEM = stats.sem(F21_diff, axis=None)
-F22_SEM = stats.sem(F22_diff, axis=None)
+F11_SEM = stats.sem(F11_diff, axis=None, nan_policy='omit')
+F12_SEM = stats.sem(F12_diff, axis=None, nan_policy='omit')
+F21_SEM = stats.sem(F21_diff, axis=None, nan_policy='omit')
+F22_SEM = stats.sem(F22_diff, axis=None, nan_policy='omit')
 
 # Write statistics to files
 
