@@ -55,7 +55,8 @@ images.sort()
 
 # Specify subregion indices
 # TODO: Make input
-subregion_indices = np.array([100, 400, 100, 400])
+# Format: [column index for start of X, column index for end of X, row index for start of Y, row index for end of Y]
+subregion_indices = np.array([75, 475, 100, 500])
 
 # Main analysis loop
 for step in range(0, len(images) - 1):
