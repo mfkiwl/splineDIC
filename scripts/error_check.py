@@ -215,15 +215,15 @@ Vmax = 0.9 * np.nanmax(V_diff)
 Vim.set_clim(Vmin, Vmax)
 ax1.set_title('Y Displacement (Pixels)')
 
-plt.savefig('Displacements Differences.png')
+plt.savefig('Displacements_Differences.png')
 
 # Statistics on difference in displacement
 
 U_diff_mean = np.nanmean(U_diff)
 V_diff_mean = np.nanmean(V_diff)
 
-U_SEM = stats.sem(U_diff, axis=None)
-V_SEM = stats.sem(V_diff, axis=None)
+U_SEM = stats.sem(U_diff, axis=None, nan_policy='omit')
+V_SEM = stats.sem(V_diff, axis=None, nan_policy='omit')
 
 # Compute differences in deformation
 # Viaualize differences in deformation
@@ -287,7 +287,7 @@ F22max = 1.1 * np.nanmax(F22_diff)
 F22im.set_clim(F22min, F22max)
 ax3.set_title('F22')
 
-plt.savefig('Deformation Differences.png')
+plt.savefig('Deformation_Differences.png')
 
 # Statistics on difference in deformation
 
