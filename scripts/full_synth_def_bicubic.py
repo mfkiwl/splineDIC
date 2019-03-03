@@ -20,8 +20,6 @@ from dic import analysis
 from dic import visualize
 import cv2
 import numpy as np
-from geomdl import BSpline as bs
-from geomdl import utilities as gutil
 import scipy.optimize as sciopt
 
 # Debugging
