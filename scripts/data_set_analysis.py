@@ -118,3 +118,5 @@ f.write('Reference Image: {}\n'.format(images[0]))
 f.write('Final Image: {}\n'.format(images[-1]))
 f.write('Mesh Details: {} by {}\n'.format(num_ctrlpts, num_ctrlpts))
 f.write('ROI Size: {} by {}\n'.format(indices[1] - indices[0], indices[3] - indices[2]))
+
+f.close()
