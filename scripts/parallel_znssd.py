@@ -32,24 +32,15 @@ pr.disable()
 try:
     system = sys.argv[1]
     data = sys.argv[2]
-    name = sys.argv[3]
-    dx = float(sys.argv[4])
-    dy = float(sys.argv[5])
-    F11 = float(sys.argv[6])
-    F12 = float(sys.argv[7])
-    F21 = float(sys.argv[8])
-    F22 = float(sys.argv[9])
+    dx = float(sys.argv[3])
+    dy = float(sys.argv[4])
+    F11 = float(sys.argv[5])
+    F12 = float(sys.argv[6])
+    F21 = float(sys.argv[7])
+    F22 = float(sys.argv[8])
 except IndexError:
     print('Invalid command line arguments')
     sys.exit(1)
-
-# Change to output directory
-start = os.getcwd()
-try:
-    os.chdir(name)
-except OSError:
-    os.makedirs(name)
-    os.chdir(name)
 
 # Read image data
 # Hard code absolute paths for now. Fix later'
