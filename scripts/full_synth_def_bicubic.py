@@ -79,6 +79,10 @@ else:
     print('Unclear image data type')
     sys.exit(1)
 
+# Translate image
+F = np.array([[F11, F12],
+              [F21, F22]])
+
 # get def image interp coefficients
 def_coeff = numerics.image_interp_bicubic(def_image)
 
