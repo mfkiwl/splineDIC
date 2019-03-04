@@ -14,20 +14,12 @@ import os
 sys.path.extend(['C:\\Users\\potterst1\\Desktop\Repositories\BitBucket\dic',
                  'C:/Users/potterst1/Desktop/Repositories/BitBucket/dic'])
 sys.path.extend(['/workspace/stpotter/git/bitbucket/dic'])
-import warnings
-from dic import nurbs
-from dic import fileIO
 from dic import numerics
 from dic import analysis
-from dic import image_processing
-from dic import visualize
 import cv2
-from matplotlib import pyplot as plt
 import numpy as np
 from geomdl import BSpline as bs
 from geomdl import utilities as gutil
-import scipy.optimize as sciopt
-import scipy.signal as sig
 
 # Debugging
 import cProfile as profile
