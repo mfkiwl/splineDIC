@@ -79,17 +79,6 @@ else:
     print('Unclear image data type')
     sys.exit(1)
 
-# Translate image
-F = np.array([[F11, F12],
-              [F21, F22]])
-Finv = np.linalg.inv(F)
-F11i = Finv[0, 0]
-F12i = Finv[0, 1]
-F21i = Finv[1, 0]
-F22i = Finv[1, 1]
-warp = np.array([[F11i, F12i, -dx],
-                 [F21i, F22i, -dy]])
-
 # get def image interp coefficients
 def_coeff = numerics.image_interp_bicubic(def_image)
 
