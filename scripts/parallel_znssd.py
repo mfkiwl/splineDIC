@@ -18,8 +18,6 @@ from dic import numerics
 from dic import analysis
 import cv2
 import numpy as np
-from geomdl import BSpline as bs
-from geomdl import utilities as gutil
 
 # Debugging
 import cProfile as profile
@@ -113,6 +111,7 @@ for i in range(len(synth_coords)):
 
 # Compute synthetic control point displacements
 synth_coords_disp = synth_coords - coords
+
 
 # Compute znssd between synthetic and ref coordinates
 synth_znssd = analysis.mesh_znssd(f_mesh, f_mean, f_stddev, def_sub_image.shape, ref_surf, uv_vals, def_sub_coeff,
