@@ -83,7 +83,7 @@ F = np.array([[F11, F12],
               [F21, F22]])
 
 rigid = np.array([dx, dy])
-
+'''
 F_set = np.zeros((numsteps,) + (2, 2))
 rigid_set = np.zeros((numsteps, 2))
 
@@ -98,26 +98,30 @@ for i in range(1, numsteps):
 
     F_set[i, :, :] = temp_F
     rigid_set[i, :] = temp_rigid
-
+'''
 # get def image interp coefficients
 def_coeff = numerics.image_interp_bicubic(def_image)
 
-# Create sub images (def)
-def_sub_image = def_image[:450, :450]
-
 # Create ref sub image and coords
-ref_sub_images = np.zeros((numsteps,) + def_sub_image.shape)
+ref_images = np.zeros((numsteps,) + def_image.shape)
+
+step_ctr = list(range(0, numsteps))
+step_ctr.reverse()
 for step in range(0, numsteps):
-    F = F_set[step, :, :]
-    dxdy = rigid_set[step, :]
+    index = step_ctr[step]
     i = 0
     j = 0
     for row in range(0, 450):
         for col in range(0, 450):
             # New pt (x, y)
-            pt = F @ np.array([col, row]) + dxdy
-            val = numerics.eval_interp_bicubic(def_coeff, pt[0], pt[1], def_image.shape)
-            ref_sub_images[step, i, j] = val
+            pt = F @ np.array([col, row]) + rigid
+            if step == 0:
+                val = numerics.eval_interp_bicubic(def_coeff, pt[0], pt[1], def_image.shape)
+            else:
+                temp_def_image = ref_images[step_ctr[step - 1], :, :]
+                temp_coeff = numerics.image_interp_bicubic(temp_def_image)
+                val = numerics.eval_interp_bicubic(temp_coeff, pt[0], pt[1], temp_def_image.shape)
+            ref_images[index, i, j] = val
             j += 1
         j = 0
         i += 1
@@ -125,11 +129,11 @@ for step in range(0, numsteps):
 # Specify region of interest
 # Format: [column index for start of X, column index for end of X, row index for start of Y, row index for end of Y]
 # TODO: Is this format the best or should it be row column and then map appropriately? Depends on UI
-subregion_indices = np.array([100, 400, 100, 400])
+subregion_indices = np.array([200, 250, 200, 250])
 
 print('Ive started the main loop')
 # Main analysis loop
-for step in range(0, numsteps - 1):
+for step in range(0, numsteps):
     # Setup analysis if needed, else pass results from previous step
     if step == 0:
         mesh_surf, uv_vals, coords, indices = analysis.setup_surf(subregion_indices)
@@ -142,12 +146,12 @@ for step in range(0, numsteps - 1):
         mesh_surf.set_ctrlpts(coords.tolist(), num_ctrlpts, num_ctrlpts)
 
     # Open images
-    if step == numsteps -2:
-        ref_image = ref_sub_images[step, :, :]
-        def_image = def_sub_image
+    if step == numsteps - 1:
+        ref_image = ref_images[step, :, :]
+        def_image = def_image
     else:
-        ref_image = ref_sub_images[step, :, :]
-        def_image = ref_sub_images[step + 1, :, :]
+        ref_image = ref_images[step, :, :]
+        def_image = ref_images[step + 1, :, :]
 
     # Interpolate images
     ref_coeff = numerics.image_interp_bicubic(ref_image)
