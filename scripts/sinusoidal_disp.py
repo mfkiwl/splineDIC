@@ -21,6 +21,11 @@ from dic import visualize
 import cv2
 import numpy as np
 import scipy.optimize as sciopt
+from geomdl import BSpline as bs
+from geomdl import utilities as gutil
+from matplotlib import pyplot as plt
+from scipy import stats
+from mpl_toolkits.axes_grid import make_axes_locatable
 
 # Debugging
 import cProfile as profile
@@ -100,7 +105,7 @@ for row in range(0, 450):
 # Specify region of interest
 # Format: [column index for start of X, column index for end of X, row index for start of Y, row index for end of Y]
 # TODO: Is this format the best or should it be row column and then map appropriately? Depends on UI
-subregion_indices = np.array([100, 400, 100, 400])
+subregion_indices = np.array([200, 250, 200, 250])
 
 # Compute some items to use for output. Will refactor later
 
@@ -117,27 +122,6 @@ def_sub_coeff = numerics.image_interp_bicubic(def_sub_image)
 # Compute reference mesh quantities of interest (array, mean, standard deviation)
 f_mesh, f_mean, f_stddev = analysis.ref_mesh_qoi(ref_surf, uv_vals, ref_sub_coeff, ref_sub_image.shape)
 
-# Test synthetically deformed control points
-synth_coords = np.zeros((len(coords), 2))
-for i in range(len(synth_coords)):
-    synth_coords[i, :] = coords[i, :] + np.array([sinusoid(coords[i, 0]), 0])
-
-# Compute synthetic control point displacements
-synth_coords_disp = synth_coords - coords
-
-# Compute znssd between synthetic and ref coordinates
-synth_znssd = analysis.mesh_znssd(f_mesh, f_mean, f_stddev, def_sub_image.shape, ref_surf, uv_vals, def_sub_coeff,
-                                  synth_coords_disp)
-
-# Print the synthetic info to stdout
-data_out = 'Using image data from ' + data
-print(data_out)
-print('Synthetic ZNSSD: {}'.format(synth_znssd))
-print('Synthetic Coordinate Displacements')
-print(synth_coords_disp)
-print('Deformation gradient at center of ROI from synthetic control points')
-print(visualize.def_grad(ref_surf, 0.5, 0.5, synth_coords_disp))
-
 # Wrap minimization arguments into a tuple
 arg_tup = (f_mesh, f_mean, f_stddev, def_sub_image.shape, ref_surf, uv_vals, def_sub_coeff)
 
@@ -149,7 +133,7 @@ int_disp_vec = analysis.rigid_guess(ref_sub_image, def_sub_image, indices[0], in
 #pr.enable()
 
 residual = analysis.scipy_minfun(int_disp_vec, *arg_tup)
-minoptions = {'maxiter': maxiterations, 'disp': False}
+minoptions = {'maxiter': maxiterations, 'disp': True}
 
 if residual > 1e-6:
     result = sciopt.minimize(analysis.scipy_minfun, int_disp_vec, args=arg_tup, method='L-BFGS-B', jac='2-point',
@@ -173,19 +157,6 @@ else:
     print('final control point displacement')
     print(coords_disp)
 
-print('Deformation gradient at center of ROI from minimization control points')
-print(visualize.def_grad(ref_surf, 0.5, 0.5, coords_disp))
-
-# Write outputs
-fname = 'sinusoidalxsynthdef.txt'
-f = open(fname, 'w')
-f.write('Mesh Coordinates\n')
-f.write('X Y dX dY\n')
-for i in range(0, len(coords)):
-    f.write('{0} {1} {2} {3} \n'.format(coords[i, 0], coords[i, 1], synth_coords_disp[i, 0], synth_coords_disp[i, 1]))
-
-f.close()
-
 fname = 'sinusoidalxmindef.txt'
 f = open(fname, 'w')
 f.write('Mesh Coordinates\n')
@@ -193,4 +164,110 @@ f.write('X Y dX dY\n')
 for i in range(0, len(coords)):
     f.write('{0} {1} {2} {3} \n'.format(coords[i, 0], coords[i, 1], coords_disp[i, 0], coords_disp[i, 1]))
 
+f.close()
+
+# Visualize results (displacement only)
+
+# Visualize minimization results
+# Set up new surface
+disp_surf = bs.Surface()
+
+disp_surf.degree_u = 3
+disp_surf.degree_v = 3
+
+disp_surf.set_ctrlpts(coords_disp.tolist(), num_ctrlpts, num_ctrlpts)
+
+disp_surf.knotvector_u = gutil.generate_knot_vector(disp_surf.degree_u, num_ctrlpts)
+disp_surf.knotvector_v = gutil.generate_knot_vector(disp_surf.degree_v, num_ctrlpts)
+
+disp_surf.delta = 0.01
+fname = 'sinusoidalxmindispl'
+visualize.viz_displacement(def_image, disp_surf, indices[0], indices[1], indices[2], indices[3], fname)
+
+# Compute differences between proscribed and actual displacement measurements
+# Fill x and y displacement arrays
+U_diff = np.zeros(def_image.shape) * np.nan
+V_diff = np.zeros(def_image.shape) * np.nan
+U_actual = np.zeros(def_image.shape) * np.nan
+V_actual = np.zeros(def_image.shape) * np.nan
+rowmin_index = indices[0]
+rowmax_index = indices[1]
+colmin_index = indices[2]
+colmax_index = indices[3]
+
+for i in range(rowmin_index, rowmax_index):
+    for j in range(colmin_index, colmax_index):
+        u_val = (j - colmin_index) / (colmax_index - colmin_index)
+        v_val = (i - rowmin_index) / (rowmax_index - rowmin_index)
+        applied_disp = np.array([sinusoid(i, max_col), 0])
+        disp_diff = applied_disp - np.array(disp_surf.surfpt(u_val, v_val))
+        U_diff[i, j] = disp_diff[0]
+        V_diff[i, j] = disp_diff[1]
+        U_actual[i, j] = applied_disp[0]
+        V_actual[i, j] = applied_disp[1]
+
+# Display applied displacements
+fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(10, 10))
+im0 = ax0.imshow(def_image, cmap='gray')
+Uim = ax0.imshow(U_actual, cmap='jet', alpha=0.7)
+divider = make_axes_locatable(ax0)
+cax0 = divider.append_axes('right', size='5%', pad=0.05)
+fig.colorbar(Uim, cax=cax0)
+Umin = 0.9 * np.nanmin(U_actual)
+Umax = 1.1 * np.nanmax(U_actual)
+Uim.set_clim(Umin, Umax)
+ax0.set_title('X Displacement (Pixels)')
+
+im1 = ax1.imshow(def_image, cmap='gray')
+Vim = ax1.imshow(V_actual, cmap='jet', alpha=0.7)
+divider = make_axes_locatable(ax1)
+cax1 = divider.append_axes('right', size='5%', pad=0.05)
+fig.colorbar(Vim, cax=cax1)
+Vmin = 0.9 * np.nanmin(V_actual)
+Vmax = 0.9 * np.nanmax(V_actual)
+Vim.set_clim(Vmin, Vmax)
+ax1.set_title('Y Displacement (Pixels)')
+
+plt.savefig('Displacements_Applied.png')
+
+# Display difference
+fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(10, 10))
+im0 = ax0.imshow(def_image, cmap='gray')
+Uim = ax0.imshow(U_diff, cmap='jet', alpha=0.7)
+divider = make_axes_locatable(ax0)
+cax0 = divider.append_axes('right', size='5%', pad=0.05)
+fig.colorbar(Uim, cax=cax0)
+Umin = 0.9 * np.nanmin(U_diff)
+Umax = 1.1 * np.nanmax(U_diff)
+Uim.set_clim(Umin, Umax)
+ax0.set_title('X Displacement (Pixels)')
+
+im1 = ax1.imshow(def_image, cmap='gray')
+Vim = ax1.imshow(V_diff, cmap='jet', alpha=0.7)
+divider = make_axes_locatable(ax1)
+cax1 = divider.append_axes('right', size='5%', pad=0.05)
+fig.colorbar(Vim, cax=cax1)
+Vmin = 0.9 * np.nanmin(V_diff)
+Vmax = 0.9 * np.nanmax(V_diff)
+Vim.set_clim(Vmin, Vmax)
+ax1.set_title('Y Displacement (Pixels)')
+
+plt.savefig('Displacements_Differences.png')
+
+# Statistics on difference in displacement
+
+U_diff_mean = np.nanmean(U_diff)
+V_diff_mean = np.nanmean(V_diff)
+
+U_SEM = stats.sem(U_diff, axis=None, nan_policy='omit')
+V_SEM = stats.sem(V_diff, axis=None, nan_policy='omit')
+
+# Write statistics to files
+
+f = open('DifferenceStatistics.txt', 'w')
+# Write U and V Stats
+f.write('Errors between synthetic and minimization results\n')
+f.write('Displacement Errors (Mean +/- SEM)\n')
+f.write('X1: {0} +/- {1}\n'.format(U_diff_mean, U_SEM))
+f.write('X2: {0} +/- {1}\n'.format(V_diff_mean, V_SEM))
 f.close()
