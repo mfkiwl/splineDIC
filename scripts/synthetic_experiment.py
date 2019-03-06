@@ -82,7 +82,7 @@ else:
 F = np.array([[F11, F12],
               [F21, F22]])
 
-rigid = np.array([2, 1])
+rigid = np.array([dx, dy])
 
 F_set = np.zeros((numsteps,) + (4, 4))
 rigid_set = np.zeros((numsteps,) + (1, 2))
@@ -105,7 +105,7 @@ def_coeff = numerics.image_interp_bicubic(def_image)
 # Create sub images (def)
 def_sub_image = def_image[:450, :450]
 
-# Create ref sub image
+# Create ref sub image and coords
 ref_sub_images = np.zeros((numsteps,) + def_sub_image.shape)
 for step in range(0, numsteps):
     F = F_set[step, :, :]
@@ -127,4 +127,87 @@ for step in range(0, numsteps):
 # TODO: Is this format the best or should it be row column and then map appropriately? Depends on UI
 subregion_indices = np.array([100, 400, 100, 400])
 
+# Main analysis loop
+for step in range(0, numsteps - 1):
+    # Setup analysis if needed, else pass results from previous step
+    if step == 0:
+        mesh_surf, uv_vals, coords, indices = analysis.setup_surf(subregion_indices)
+        num_ctrlpts = np.sqrt(len(coords)).astype('int')
+    else:
+        # Compute new coordinate locations
+        coords = np.array(mesh_surf.ctrlpts) + coords_disp
 
+        # Set mesh with new control points
+        mesh_surf.set_ctrlpts(coords.tolist(), num_ctrlpts, num_ctrlpts)
+
+    # Open images
+    if step == numsteps -2:
+        ref_image = ref_sub_images[step, :, :]
+        def_image = def_sub_image
+    else:
+        ref_image = ref_sub_images[step, :, :]
+        def_image = ref_sub_images[step + 1, :, :]
+
+    # Interpolate images
+    ref_coeff = numerics.image_interp_bicubic(ref_image)
+    def_coeff = numerics.image_interp_bicubic(def_image)
+
+    # Compute reference mesh quantities of interest (array, mean, standard deviation)
+    f_mesh, f_mean, f_stddev = analysis.ref_mesh_qoi(mesh_surf, uv_vals, ref_coeff, ref_image.shape)
+
+    # Wrap minimization arguments into a tuple
+    arg_tup = (f_mesh, f_mean, f_stddev, def_image.shape, mesh_surf, uv_vals, def_coeff)
+
+    # Compute rigid guess
+    int_disp_vec = analysis.rigid_guess(ref_image, def_image, indices[0], indices[1], indices[2], indices[3],
+                                        len(coords))
+
+    # Setup minimization options
+    minoptions = {'maxiter': 20, 'disp': False}
+
+    # Minimize
+    minresults = sciopt.minimize(analysis.scipy_minfun, int_disp_vec, args=arg_tup, method='L-BFGS-B', jac='2-point',
+                             bounds=None, options=minoptions)
+
+    coords_disp = np.column_stack((minresults.x[::2], minresults.x[1::2]))
+
+    # Synthetic displacement results
+    synth_coords = np.zeros((len(coords), 2))
+    for i in range(len(synth_coords)):
+        synth_coords[i, :] = F @ coords[i, :] + rigid
+
+    # Compute synthetic control point displacements
+    synth_coords_disp = synth_coords - coords
+
+    # Compute znssd between synthetic and ref coordinates
+    synth_znssd = analysis.mesh_znssd(f_mesh, f_mean, f_stddev, def_sub_image.shape, mesh_surf, uv_vals, def_sub_coeff,
+                                      synth_coords_disp)
+
+    # Write outputs of step to file
+    fname = name + 'synthdef.txt'
+    f = open(fname, 'w')
+    f.write('Mesh Coordinates\n')
+    f.write('X Y dX dY\n')
+    for i in range(0, len(coords)):
+        f.write('{0} {1} {2} {3} \n'.format(coords[i, 0], coords[i, 1], synth_coords_disp[i, 0],
+                                            synth_coords_disp[i, 1]))
+
+    f.close()
+
+    fname = str(step) + str(step + 1) + 'results.txt'
+    f = open(fname, 'w')
+    f.write('Final Minimization ZNSSD: {}\n'.format(minresults.fun))
+    f.write('Mesh Coordinates\n')
+    f.write('X Y dX dY\n')
+    for i in range(0, len(coords)):
+        f.write('{0} {1} {2} {3} \n'.format(coords[i, 0], coords[i, 1], coords_disp[i, 0], coords_disp[i, 1]))
+
+    f.close()
+
+# Write analysis details
+fname = 'analysis_summary.txt'
+f = open(fname, 'w')
+f.write('Mesh Details: {} by {}\n'.format(num_ctrlpts, num_ctrlpts))
+f.write('ROI Size: {} by {}\n'.format(indices[1] - indices[0], indices[3] - indices[2]))
+
+f.close()
