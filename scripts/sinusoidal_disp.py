@@ -105,7 +105,7 @@ for row in range(0, 450):
 # Specify region of interest
 # Format: [column index for start of X, column index for end of X, row index for start of Y, row index for end of Y]
 # TODO: Is this format the best or should it be row column and then map appropriately? Depends on UI
-subregion_indices = np.array([200, 250, 200, 250])
+subregion_indices = np.array([100, 400, 100, 400])
 
 # Compute some items to use for output. Will refactor later
 
