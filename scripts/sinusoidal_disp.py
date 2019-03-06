@@ -188,8 +188,6 @@ visualize.viz_displacement(def_image, disp_surf, indices[0], indices[1], indices
 # Fill x and y displacement arrays
 U_diff = np.zeros(def_image.shape) * np.nan
 V_diff = np.zeros(def_image.shape) * np.nan
-U_actual = np.zeros(def_image.shape) * np.nan
-V_actual = np.zeros(def_image.shape) * np.nan
 rowmin_index = indices[0]
 rowmax_index = indices[1]
 colmin_index = indices[2]
@@ -203,32 +201,6 @@ for i in range(rowmin_index, rowmax_index):
         disp_diff = applied_disp - np.array(disp_surf.surfpt(u_val, v_val))
         U_diff[i, j] = disp_diff[0]
         V_diff[i, j] = disp_diff[1]
-        U_actual[i, j] = applied_disp[0]
-        V_actual[i, j] = applied_disp[1]
-
-# Display applied displacements
-fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(10, 10))
-im0 = ax0.imshow(def_image, cmap='gray')
-Uim = ax0.imshow(U_actual, cmap='jet', alpha=0.7)
-divider = make_axes_locatable(ax0)
-cax0 = divider.append_axes('right', size='5%', pad=0.05)
-fig.colorbar(Uim, cax=cax0)
-Umin = 0.9 * np.nanmin(U_actual)
-Umax = 1.1 * np.nanmax(U_actual)
-Uim.set_clim(Umin, Umax)
-ax0.set_title('X Displacement (Pixels)')
-
-im1 = ax1.imshow(def_image, cmap='gray')
-Vim = ax1.imshow(V_actual, cmap='jet', alpha=0.7)
-divider = make_axes_locatable(ax1)
-cax1 = divider.append_axes('right', size='5%', pad=0.05)
-fig.colorbar(Vim, cax=cax1)
-Vmin = 0.9 * np.nanmin(V_actual)
-Vmax = 0.9 * np.nanmax(V_actual)
-Vim.set_clim(Vmin, Vmax)
-ax1.set_title('Y Displacement (Pixels)')
-
-plt.savefig('Displacements_Applied.png')
 
 # Display difference
 fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(10, 10))
@@ -255,6 +227,37 @@ ax1.set_title('Y Displacement (Pixels)')
 plt.savefig('Displacements_Differences.png')
 
 # Statistics on difference in displacement
+U_actual = np.zeros(def_image.shape) * np.nan
+V_actual = np.zeros(def_image.shape) * np.nan
+for i in range(0, max_col):
+    for j in range(0, max_col):
+        applied_disp = np.array([sinusoid(j, max_col), 0])
+        U_actual[i, j] = applied_disp[0]
+        V_actual[i, j] = applied_disp[1]
+
+# Display applied displacements
+fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(10, 10))
+im0 = ax0.imshow(def_image, cmap='gray')
+Uim = ax0.imshow(U_actual, cmap='jet', alpha=0.7)
+divider = make_axes_locatable(ax0)
+cax0 = divider.append_axes('right', size='5%', pad=0.05)
+fig.colorbar(Uim, cax=cax0)
+Umin = 0.9 * np.nanmin(U_actual)
+Umax = 1.1 * np.nanmax(U_actual)
+Uim.set_clim(Umin, Umax)
+ax0.set_title('X Displacement (Pixels)')
+
+im1 = ax1.imshow(def_image, cmap='gray')
+Vim = ax1.imshow(V_actual, cmap='jet', alpha=0.7)
+divider = make_axes_locatable(ax1)
+cax1 = divider.append_axes('right', size='5%', pad=0.05)
+fig.colorbar(Vim, cax=cax1)
+Vmin = 0.9 * np.nanmin(V_actual)
+Vmax = 0.9 * np.nanmax(V_actual)
+Vim.set_clim(Vmin, Vmax)
+ax1.set_title('Y Displacement (Pixels)')
+
+plt.savefig('Displacements_Applied.png')
 
 U_diff_mean = np.nanmean(U_diff)
 V_diff_mean = np.nanmean(V_diff)
