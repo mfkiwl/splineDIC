@@ -180,7 +180,7 @@ for step in range(0, numsteps - 1):
     synth_coords_disp = synth_coords - coords
 
     # Compute znssd between synthetic and ref coordinates
-    synth_znssd = analysis.mesh_znssd(f_mesh, f_mean, f_stddev, def_sub_image.shape, mesh_surf, uv_vals, def_sub_coeff,
+    synth_znssd = analysis.mesh_znssd(f_mesh, f_mean, f_stddev, def_image.shape, mesh_surf, uv_vals, def_coeff,
                                       synth_coords_disp)
 
     # Write outputs of step to file
