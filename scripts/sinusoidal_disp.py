@@ -197,7 +197,7 @@ for i in range(rowmin_index, rowmax_index):
     for j in range(colmin_index, colmax_index):
         u_val = (j - colmin_index) / (colmax_index - colmin_index)
         v_val = (i - rowmin_index) / (rowmax_index - rowmin_index)
-        applied_disp = np.array([sinusoid(i, max_col), 0])
+        applied_disp = np.array([sinusoid(j, max_col), 0])
         disp_diff = applied_disp - np.array(disp_surf.surfpt(u_val, v_val))
         U_diff[i, j] = disp_diff[0]
         V_diff[i, j] = disp_diff[1]
@@ -226,7 +226,6 @@ ax1.set_title('Y Displacement (Pixels)')
 
 plt.savefig('Displacements_Differences.png')
 
-# Statistics on difference in displacement
 U_actual = np.zeros(def_image.shape) * np.nan
 V_actual = np.zeros(def_image.shape) * np.nan
 for i in range(0, max_col):
@@ -259,6 +258,7 @@ ax1.set_title('Y Displacement (Pixels)')
 
 plt.savefig('Displacements_Applied.png')
 
+# Statistics on differences in displacement
 U_diff_mean = np.nanmean(U_diff)
 V_diff_mean = np.nanmean(V_diff)
 
