@@ -186,8 +186,9 @@ for step in range(0, numsteps - 1):
                                       synth_coords_disp)
 
     # Write outputs of step to file
-    fname = name + 'synthdef.txt'
+    fname = str(step) + str(step + 1) + 'synthetic.txt'
     f = open(fname, 'w')
+    f.write('Synthetic ZNSSD: {}\n'.format(synth_znssd))
     f.write('Mesh Coordinates\n')
     f.write('X Y dX dY\n')
     for i in range(0, len(coords)):
