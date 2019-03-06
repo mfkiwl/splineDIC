@@ -84,11 +84,11 @@ F = np.array([[F11, F12],
 
 rigid = np.array([dx, dy])
 
-F_set = np.zeros((numsteps,) + (4, 4))
-rigid_set = np.zeros((numsteps,) + (1, 2))
+F_set = np.zeros((numsteps,) + (2, 2))
+rigid_set = np.zeros((numsteps, 2))
 
 F_set[0, :, :] = F
-rigid_set[0, :, :] = rigid
+rigid_set[0, :] = rigid
 
 temp_F = F
 temp_rigid = rigid
@@ -97,7 +97,7 @@ for i in range(1, numsteps):
     temp_rigid = temp_rigid + rigid
 
     F_set[i, :, :] = temp_F
-    rigid_set[i, :, :] = temp_rigid
+    rigid_set[i, :] = temp_rigid
 
 # get def image interp coefficients
 def_coeff = numerics.image_interp_bicubic(def_image)
@@ -109,7 +109,7 @@ def_sub_image = def_image[:450, :450]
 ref_sub_images = np.zeros((numsteps,) + def_sub_image.shape)
 for step in range(0, numsteps):
     F = F_set[step, :, :]
-    dxdy = rigid_set[step, :, :]
+    dxdy = rigid_set[step, :]
     i = 0
     j = 0
     for row in range(0, 450):
@@ -117,7 +117,7 @@ for step in range(0, numsteps):
             # New pt (x, y)
             pt = F @ np.array([col, row]) + dxdy
             val = numerics.eval_interp_bicubic(def_coeff, pt[0], pt[1], def_image.shape)
-            ref_sub_images[i, j] = val
+            ref_sub_images[step, i, j] = val
             j += 1
         j = 0
         i += 1
@@ -127,6 +127,7 @@ for step in range(0, numsteps):
 # TODO: Is this format the best or should it be row column and then map appropriately? Depends on UI
 subregion_indices = np.array([100, 400, 100, 400])
 
+print('Ive started the main loop')
 # Main analysis loop
 for step in range(0, numsteps - 1):
     # Setup analysis if needed, else pass results from previous step
@@ -166,6 +167,7 @@ for step in range(0, numsteps - 1):
     minoptions = {'maxiter': 20, 'disp': False}
 
     # Minimize
+    print('Ive started to minimize')
     minresults = sciopt.minimize(analysis.scipy_minfun, int_disp_vec, args=arg_tup, method='L-BFGS-B', jac='2-point',
                              bounds=None, options=minoptions)
 
