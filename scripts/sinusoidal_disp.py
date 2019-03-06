@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 '''
 .. script:: sinusoidal_disp.py
     :platform: Unix, Windows
