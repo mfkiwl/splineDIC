@@ -176,6 +176,7 @@ synth_coords_disp = synth_coords - coords
 
 # Compute znssd between synthetic and ref coordinates
 pr.enable()
+pdb.set_trace()
 synth_znssd = analysis.mesh_znssd(roi, ref_sub_image.shape, def_sub_image.shape, ref_surf, uv_vals,
                                   ref_sub_coeff, def_sub_coeff, synth_coords_disp)
 
