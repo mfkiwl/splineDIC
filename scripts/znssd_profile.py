@@ -106,4 +106,4 @@ synth_znssd = analysis.mesh_znssd(f_mesh, f_mean, f_stddev, def_sub_image.shape,
                                   synth_coords_disp)
 
 pr.disable()
-pr.dump_stats('mesh_eval_znssd.pstat')
+pr.dump_stats('znssd.pstat')
