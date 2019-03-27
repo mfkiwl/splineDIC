@@ -4,7 +4,5 @@
  * Sam Potter
  *
  *--------------------------------------------------------------------------------------
- *  nurbs.c: C module for basic B-spline surface constructs
+ *  nurbs.h: header file for functions defined in nurbs.c
  *-------------------------------------------------------------------------------------*/
- 
- #include nurbs.h
