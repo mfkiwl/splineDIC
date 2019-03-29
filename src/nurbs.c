@@ -7,7 +7,54 @@
  *  nurbs.c: C module for basic B-spline surface constructs
  *-------------------------------------------------------------------------------------*/
  
- #include nurbs.h
+ #include "nurbs.h"
+ #include <stdlib.h>
+
+ /*-------------------------------------------------------------------------------------
+  * find_span: function for determining the knot span given a knot value.
+  *-------------------------------------------------------------------------------------*/
+
+ int find_span(int num_ctrlpts, int degree, double knot, int knot_vector)
+ {
+    double rtol = 1E-6;
+    if(abs(knot - knot_vector[num_ctrlpts]) <= rtol){
+        return num_ctrlpts - 1;
+    }
+
+    // Begin binary search
+    int low = degree;
+    int high = num_ctrlpts;
+    
+    // Compute midpoint sum
+    int mid_sum = low + high;
+
+    // Case structure on whether mid_sum is odd or even
+    double mid;
+    if(mid_sum % 2 == 0){
+        mid = mid_sum * 0.5;
+    } else {
+        mid = (mid_sum + 1) * 0.5;
+    }
+
+    // Cast result to int so it works as an index
+    int mid_index = (int) mid;
+
+    // While loop to perform binary search
+    while(knot < knot_vector[mid_index] || knot > knot_vector[mid_index + 1]){
+        // Update high/low
+        if(knot < knot_vector[mid_index]){
+            high = mid_index;
+        } else {
+            low = mid_index;
+        }
+
+        // Update mid value
+        mid_index = (int) ((low + high) * 0.5);
+    }
+    
+    return mid_index;
+}
+        
  
  double basis_functions(int knot_span, double knot, int degree, double knot_vector)
  {
