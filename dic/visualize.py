@@ -11,6 +11,7 @@ from . import helpers
 from . import plt
 from . import make_axes_locatable
 from . import utilities
+from . import odf
 
 
 def jac_inv(surf, u, v):
@@ -327,7 +328,7 @@ def viz_deformation(ref_image, ref_surf, rowmin, rowmax, colmin, colmax, coords_
         plt.show()
 
 
-def Ifiber_interactive(a0, a2, a4, phi, numpts=100, normalize=True):
+def Ifiber_interactive(a0, a2, a4, phi, theta_info, normalize=True):
 
     '''
     Function for interactive visualiztion of single fiber Mie scattering
@@ -340,16 +341,17 @@ def Ifiber_interactive(a0, a2, a4, phi, numpts=100, normalize=True):
     :type a4: float
     :param phi: preferred fiber direction in degrees
     :type phi: float
-    :param numpts: number of theta points to evaluate
-    :type numpts: int
+    :param theta_info: tuple containing max, min and number of points to define theta
+    :type theta_info: tuple
     :param normalize: Bool switch on whether or not to normalize results
     :type normalize: bool
     :return:
     '''
 
-    theta = np.linspace(-90, 90, numpts)
+    theta_min, theta_max, theta_numpts = theta_info
+    theta = np.linspace(theta_min, theta_max, theta_numpts)
 
-    vals = a0 + a2 * np.cos(np.deg2rad(2 * (theta - phi))) + a4 * np.cos(np.deg2rad(4 * (theta - phi)))
+    vals = odf.Ifiber(a0, a2, a4, phi, theta)
 
     if normalize:
         vals = utilities.normalize_1d(vals)
