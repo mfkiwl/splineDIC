@@ -107,4 +107,18 @@ def distribution_minimand(a0, a2, a4, phi, theta, data):
     return ssd
 
 
+def distribution_minfun(params, *args):
 
+    '''
+    Function for passing to scipy optimization algorithm that calls the distribution minimand. Used to find ai terms to
+    fit a distribution of fibers.
+
+    :param params: ai terms and phi in a list like structure
+    :type: ndarray
+    :param args: tuple containing additional needed data for the minimand
+    :type args: tup`
+    :return: evaluated ssd via the minimand
+    :rtype: float
+    '''
+
+    return distribution_minimand(params[0], params[1], params[2], params[3], *args)
