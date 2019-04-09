@@ -38,9 +38,12 @@ def syntheticIdist(a0, a2, a4, phi, theta, splay, nsamples, distribution='unifor
     '''
     Function for generating a synthetic pSFDI signal from a distribution of fibers directions about a mean of phi.
 
-    :param a0:
-    :param a2:
-    :param a4:
+    :param a0: a0 parameter
+    :type a0: float
+    :param a2: a2 parameter
+    :type a2: float
+    :param a4: a4 parameter
+    :type a4: float
     :param phi: preferred fiber direction in degrees
     :type phi: float
     :param theta: Values of theta at which to evaluate the cosine series. Values in degrees
@@ -69,3 +72,39 @@ def syntheticIdist(a0, a2, a4, phi, theta, splay, nsamples, distribution='unifor
     Idist = np.sum(Idist, axis=0) / nsamples
 
     return Idist
+
+
+def distribution_minimand(a0, a2, a4, phi, theta, data):
+
+    '''
+    Function that compares a trial vector of ai cosine series parameters with given data and returns the sum of square
+    differences between the quantities
+
+    :param a0: a0 parameter
+    :type a0: float
+    :param a2: a2 parameter
+    :type a2: float
+    :param a4: a4 parameter
+    :type a4: float
+    :param phi: preferred fiber direction in degrees
+    :type phi: float
+    :param theta: Values of theta at which to evaluate the cosine series. Values in degrees
+    :type theta: ndarray
+    :param data: Cosine series data against which the model is being compared. Must be same length as theta array
+    :type data: ndarray
+    :return: Sum of squared differences between cosine series using given ai parameters and data
+    :rtype: float
+    '''
+
+    feval = Ifiber(a0, a2, a4, phi, theta)
+
+    diff = data - feval
+
+    diffsq = np.square(diff, diff)
+
+    ssd = np.sum(diffsq)
+
+    return ssd
+
+
+
