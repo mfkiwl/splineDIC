@@ -22,10 +22,50 @@ def Ifiber(a0, a2, a4, phi, theta):
     :type a4: float
     :param phi: preferred fiber direction in degrees
     :type phi: float
-    :param theta:
-    :return:
+    :param theta: Values of theta at which to evaluate the cosine series. Values in degrees
+    :type theta: ndarray
+    :return: Intensity values
+    :rtype: ndarray
     '''
 
     vals = a0 + a2 * np.cos(np.deg2rad(2 * (theta - phi))) + a4 * np.cos(np.deg2rad(4 * (theta - phi)))
 
     return vals
+
+
+def syntheticIdist(a0, a2, a4, phi, splay, nsamples, distribution='uniform'):
+
+    '''
+    Function for generating a synthetic pSFDI signal from a distribution of fibers directions about a mean of phi.
+    Theta is fixed in the range [-90, 90].
+
+    :param a0:
+    :param a2:
+    :param a4:
+    :param phi: preferred fiber direction in degrees
+    :type phi: float
+    :param splay: standard deviation of fiber direction distribution
+    :type splay: float
+    :param nsamples: number of samples to draw from the statistical distribution
+    :type nsamples: int
+    :param distribution: Optional. Specify type of distribution to draw samples from. Default is uniform
+    :type distribution: str
+    :return: Return a periodic signal representing the summed contributions of each single fiber sample to the over all
+    signal
+    :rtype: ndarray
+    '''
+
+    theta = np.linspace(-90, 90, 100)
+    Idist = np.zeros((nsamples, len(theta)))
+    for i in range(0, nsamples):
+        if distribution == 'uniform':
+            phi = np.random.uniform(-1 * splay, splay)
+        elif distribution == 'normal':
+            phi = np.random.normal(0, splay)
+
+        vals = Ifiber(a0, a2, a4, phi, theta)
+        Idist[i, :] = vals
+
+    Idist = np.sum(Idist, axis=0) / nsamples
+
+    return Idist
