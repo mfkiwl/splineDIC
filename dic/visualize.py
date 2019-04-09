@@ -328,7 +328,7 @@ def viz_deformation(ref_image, ref_surf, rowmin, rowmax, colmin, colmax, coords_
         plt.show()
 
 
-def Ifiber_interactive(a0, a2, a4, phi, theta_info, normalize=True):
+def Ifiber_interactive(a0, a2, a4, phi, theta_min, theta_max, theta_numpts, normalize=True):
 
     '''
     Function for interactive visualiztion of single fiber Mie scattering
@@ -341,14 +341,17 @@ def Ifiber_interactive(a0, a2, a4, phi, theta_info, normalize=True):
     :type a4: float
     :param phi: preferred fiber direction in degrees
     :type phi: float
-    :param theta_info: tuple containing max, min and number of points to define theta
-    :type theta_info: tuple
+    :param theta_min: minimum value of the theta span
+    :type theta_min: float
+    :param theta_max: maximum value of the theta span
+    :type theta_max: float
+    :param theta_numpts: number of points in the theta span
+    :type theta_numpts: int
     :param normalize: Bool switch on whether or not to normalize results
     :type normalize: bool
     :return:
     '''
 
-    theta_min, theta_max, theta_numpts = theta_info
     theta = np.linspace(theta_min, theta_max, theta_numpts)
 
     vals = odf.Ifiber(a0, a2, a4, phi, theta)
