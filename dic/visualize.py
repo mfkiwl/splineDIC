@@ -10,6 +10,7 @@ from . import np
 from . import helpers
 from . import plt
 from . import make_axes_locatable
+from . import utilities
 
 
 def jac_inv(surf, u, v):
@@ -324,3 +325,41 @@ def viz_deformation(ref_image, ref_surf, rowmin, rowmax, colmin, colmax, coords_
         plt.savefig(name + 'Deformation.png')
     else:
         plt.show()
+
+
+def Ifiber_interactive(a0, a2, a4, phi, numpts=100, normalize=True):
+
+    '''
+    Function for interactive visualiztion of single fiber Mie scattering
+
+    :param a0: a0 parameter
+    :type a0: float
+    :param a2: a2 parameter
+    :type a2: float
+    :param a4: a4 parameter
+    :type a4: float
+    :param phi: preferred fiber direction in degrees
+    :type phi: float
+    :param numpts: number of theta points to evaluate
+    :type numpts: int
+    :param normalize: Bool switch on whether or not to normalize results
+    :type normalize: bool
+    :return:
+    '''
+
+    theta = np.linspace(-90, 90, numpts)
+
+    vals = a0 + a2 * np.cos(np.deg2rad(2 * (theta - phi))) + a4 * np.cos(np.deg2rad(4 * (theta - phi)))
+
+    if normalize:
+        vals = utilities.normalize_1d(vals)
+
+    fig = plt.figure(figsize=(10, 10))
+    plt.plot(theta, vals, color='g', label='Intensity');
+    plt.legend(prop={'size': 18});
+    plt.xlabel(r'$\theta$', fontsize=18);
+    plt.ylabel('Normalized Intensity (a.u.)', fontsize=18);
+    plt.title('Normalized Intensity Curves of Single Fiber under Cylindrical Scattering', fontsize=18);
+    plt.autoscale(enable=True, axis='x', tight=True)
+
+    print('a2/a4: {}'.format(a2 / a4))
