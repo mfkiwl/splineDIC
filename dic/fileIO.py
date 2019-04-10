@@ -210,3 +210,63 @@ def write_pSFDI_tiffs(data_dict, directory=None):
 
     if directory:
         os.chdir(start)
+
+
+def read_raw_psfdi(data_path, xrange, yrange, sfx_per, polar_res):
+
+    '''
+    This function reads in the raw pSFDI image data and returns 3D arrays of the image sets.
+
+    :param data_path: Absolute path to data folder
+    :type data_path: str
+    :param xrange: numpy array of row index corresponding to data mask
+    :type xrange: ndarray
+    :param yrange: numpy array of column index corresponding to  data mask
+    :type yrange: ndarray
+    :param sfx_per: Period of the spatial frequency images to load
+    :type sfx_per: float
+    :param polar_res: Resolution of polarizer used to collect images
+    :type polar_res: float
+    :return: Tuple of of image data (dark images, planar images, I0, I120, I240)
+    :rtype: tuple
+    '''
+
+    pass
+
+
+def read_no_sfx(data_path, xrange, yrange, polar_res, polar_max, imtype):
+
+    '''
+    This function reads and crops image data that does not have a spatial frequency pattern projected on to it
+
+    :param data_path: Absolute path to data folder
+    :type data_path: str
+    :param xrange: numpy array of row index corresponding to data mask
+    :type xrange: ndarray
+    :param yrange: numpy array of column index corresponding to  data mask
+    :type yrange: ndarray
+    :param polar_res: Resolution of polarizer used to collect images
+    :type polar_res: float
+    :param polar_max: Max angle over which polarizer was rotated
+    :type polar_max: int
+    :param imtype: Type of non spatial frequency image to read. Options are dark, planar.
+    :type imtype: str
+    :return: Array of cropped image data
+    :rtype: ndarray
+    '''
+
+    # Set polar angles
+    polar_angles = np.arange(0, polar_max, polar_res)
+
+    # Read in files
+    images = [cv2.imread(os.path.join(data_path, imtype+'_angle_' + str(angle) + '.tiff'), -1) for angle in
+                   polar_angles]
+    # Convert to numpy array
+    images = np.array(images)
+
+    # Crop
+    # Do this in steps to avoid broadcasting issues. EVALUATE LATER
+    images = images[:, xrange.tolist()[0], :]
+    images = images[:, :, yrange.tolist()[0]]
+
+    return images
