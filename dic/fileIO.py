@@ -212,6 +212,25 @@ def write_pSFDI_tiffs(data_dict, directory=None):
         os.chdir(start)
 
 
+def read_psfdi_mask(data_path):
+
+    '''
+    This function reads and returns the data mask created during pSFDI processing in matlab
+
+    :param data_path: Absolute path to data folder
+    :type data_path: str
+    :return: tuple of rows, columns of the mask (xrange, yrange)
+    :rtype: tuple
+    '''
+
+    mask_path = os.path.join(data_path, 'cmask.mat')
+    mask_dict = read_mat_file(mask_path)
+    xrange = mask_dict['xrange']
+    yrange = mask_dict['yrange']
+
+    return xrange, yrange
+
+
 def read_raw_psfdi(data_path, xrange, yrange, sfx_per, polar_res):
 
     '''
