@@ -231,7 +231,7 @@ def read_psfdi_mask(data_path):
     return xrange, yrange
 
 
-def read_raw_psfdi(data_path, xrange, yrange, sfx_per, polar_res):
+def read_raw_psfdi(data_path, xrange, yrange, sfx_per, polar_res, polar_max):
 
     '''
     This function reads in the raw pSFDI image data and returns 3D arrays of the image sets.
@@ -244,13 +244,21 @@ def read_raw_psfdi(data_path, xrange, yrange, sfx_per, polar_res):
     :type yrange: ndarray
     :param sfx_per: Period of the spatial frequency images to load
     :type sfx_per: float
+    :param polar_max: Max angle over which polarizer was rotated
+    :type polar_max: int
     :param polar_res: Resolution of polarizer used to collect images
     :type polar_res: float
     :return: Tuple of of image data (dark images, planar images, I0, I120, I240)
     :rtype: tuple
     '''
 
-    pass
+    # Read images with no spatial frequency
+    dark = read_no_sfx(data_path, xrange, yrange, polar_res, polar_max, 'dark')
+    planar = read_no_sfx(data_path, xrange, yrange, polar_res, polar_max, 'planar')
+
+    # Read images with spatial frequency
+
+    return dark, planar
 
 
 def read_no_sfx(data_path, xrange, yrange, polar_res, polar_max, imtype):
