@@ -1,0 +1,12 @@
+name: splineDIC
+dependencies:
+    - python=3.6
+    - pytest
+    - pytest-cov
+    - numpy
+    - scipy
+    - opencv
+    - matplotlib
+    - regex
+    - numba
+    - cython
