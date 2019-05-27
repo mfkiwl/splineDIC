@@ -1,4 +1,4 @@
-name: splineDIC
+name: test
 dependencies:
     - python=3.6
     - pytest
