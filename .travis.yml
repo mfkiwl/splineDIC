@@ -5,13 +5,13 @@ services:
   - docker
 
 before_install:
-  - docker build -t splineDIC .
+  - docker build -t splinedic .
 
 install:
   - pip install codecov
 
 script:
-  - docker run splineDIC /bin/bash -c "cd /code && source activate test && python -m pytest -v --cov=./ && bash <(curl -s https://codecov.io/bash) -t d496f5d1-9b8f-4fe9-a790-9cf3a9e7474f"
+  - docker run splinedic /bin/bash -c "cd /code && source activate test && python -m pytest -v --cov=./ && bash <(curl -s https://codecov.io/bash) -t d496f5d1-9b8f-4fe9-a790-9cf3a9e7474f"
 
 notifications:
   email: false
