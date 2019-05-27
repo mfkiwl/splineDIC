@@ -7,8 +7,8 @@
     Requires pytest
 """
 
-from .context import pysplinefit
-from pysplinefit import basis
+from .context import splineDIC
+from splineDIC import basis
 
 import pytest
 import numpy as np

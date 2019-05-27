@@ -7,9 +7,9 @@
     Requires pytest
 """
 
-from .context import pysplinefit
+from .context import splineDIC
 from .context import np
-from pysplinefit import knots
+from splineDIC import knots
 
 import pytest
 
