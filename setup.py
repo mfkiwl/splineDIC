@@ -1,20 +1,20 @@
 #!/usr/bin/env python
 
 """
-    Simple setup.py script for pysplinefit package
+    Simple setup.py script for splineDIC package
 """
 
 from setuptools import setup, find_packages
 
 # Meta-data
-NAME = 'pysplinefit'
-DESCRIPTION = 'Tools for fitting Spline curves and surfaces to unstructured data'
-URL = 'https://github.com/stpotter16/PySplineFit'
+NAME = 'splineDIC'
+DESCRIPTION = 'Digital image correlation using spline basis functions'
+URL = 'https://github.com/stpotter16/splineDIC'
 EMAIL = 'spotter1642@gmail.com'
 AUTHOR = 'Sam Potter'
 REQUIRES_PYTHON = '>=3.6.0'
 VERSION = 1.0
-REQUIRED = ['numpy', 'scipy', 'meshio']
+REQUIRED = ['numpy', 'scipy', 'opencv', 'matplotlib', 'regex', 'numba']
 
 # Call setup
 setup(
@@ -25,7 +25,7 @@ setup(
     author_email=EMAIL,
     python_requires=REQUIRES_PYTHON,
     url=URL,
-    py_modules=['pysplinefit'],
+    py_modules=['splineDIC'],
     install_requires=REQUIRED,
     license='MIT',
     packages=find_packages()
