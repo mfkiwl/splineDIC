@@ -18,9 +18,6 @@ import errno
 import regex
 from scipy import signal
 import warnings
-import geomdl.helpers as helpers
-import geomdl.BSpline as bs
-import geomdl.utilities as gutil
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from scipy.ndimage import sobel
 from numba import jit
