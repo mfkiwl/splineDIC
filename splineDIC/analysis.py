@@ -9,8 +9,6 @@
 from . import np
 from . import warnings
 from . import numerics
-from . import bs
-from . import gutil
 from . import signal
 
 
