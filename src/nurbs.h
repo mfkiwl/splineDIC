@@ -7,7 +7,11 @@
  *  nurbs.h: header file for functions defined in nurbs.c
  *-------------------------------------------------------------------------------------*/
 
+ /* Includes */
+
+ #include <string.h>
+
 /* Function prototypes */
 
- int find_span(int num_ctrlpts, int degree, double knot, double knot_vector);
- double basis_functions(int knot_span, double knot, int degree, double knot_vector);
+ int find_span(int num_ctrlpts, int degree, double knot, double knot_vector[]);
+ int basis_functions(double* N, int knot_span, double knot, int degree, double knot_vector[]);
