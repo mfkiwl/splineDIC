@@ -9,17 +9,12 @@
 # Path extensions (probably not necessary, but whatever)
 # bootstrap $PATH
 import sys
-import os
-
-sys.path.extend(['C:\\Users\\potterst1\\Desktop\Repositories\BitBucket\dic',
-                 'C:/Users/potterst1/Desktop/Repositories/BitBucket/dic'])
-sys.path.extend(['/workspace/stpotter/git/bitbucket/dic'])
-from dic import numerics
-from dic import analysis
+from splineDIC import numerics
+from splineDIC import analysis
+from splineDIC import spline
+from splineDIC import knots
 import cv2
 import numpy as np
-from geomdl import BSpline as bs
-from geomdl import utilities as gutil
 
 # Debugging
 import cProfile as profile
@@ -32,24 +27,15 @@ pr.disable()
 try:
     system = sys.argv[1]
     data = sys.argv[2]
-    name = sys.argv[3]
-    dx = float(sys.argv[4])
-    dy = float(sys.argv[5])
-    F11 = float(sys.argv[6])
-    F12 = float(sys.argv[7])
-    F21 = float(sys.argv[8])
-    F22 = float(sys.argv[9])
+    dx = float(sys.argv[3])
+    dy = float(sys.argv[4])
+    F11 = float(sys.argv[5])
+    F12 = float(sys.argv[6])
+    F21 = float(sys.argv[7])
+    F22 = float(sys.argv[8])
 except IndexError:
     print('Invalid command line arguments')
     sys.exit(1)
-
-# Change to output directory
-start = os.getcwd()
-try:
-    os.chdir(name)
-except OSError:
-    os.makedirs(name)
-    os.chdir(name)
 
 # Read image data
 # Hard code absolute paths for now. Fix later'
@@ -120,20 +106,23 @@ for i in range(0, len(x)):
         coords[k, :] = np.array([x[i], y[j]])
         k += 1
 
+coords3d = np.column_stack((coords, np.zeros(len(coords))))
+
 # Surface
-ref_surf = bs.Surface()
+ref_surf = spline.Surface()
 
 ref_surf.degree_u = 3
 ref_surf.degree_v = 3
 
 num_ctrlpts = np.sqrt(len(coords)).astype('int')
+ref_surf.num_ctrlpts_u = num_ctrlpts
+ref_surf.num_ctrlpts_v = num_ctrlpts
 
-ref_surf.set_ctrlpts(coords.tolist(), num_ctrlpts, num_ctrlpts)
+ref_surf.control_points = coords3d
 
-ref_surf.knotvector_u = gutil.generate_knot_vector(ref_surf.degree_u, num_ctrlpts)
-ref_surf.knotvector_v = gutil.generate_knot_vector(ref_surf.degree_v, num_ctrlpts)
+ref_surf.knot_vector_u = knots.generate_uniform(ref_surf.degree_u, num_ctrlpts)
+ref_surf.knot_vector_v = knots.generate_uniform(ref_surf.degree_v, num_ctrlpts)
 
-ref_surf.delta = 0.01
 
 #TODO: MAKE THIS A FUNCTION
 # Compute ROI and ROI uv values
@@ -166,6 +155,9 @@ for i in range(0, rowmax):
 ref_sub_coeff = numerics.image_interp_bicubic(ref_sub_image)
 def_sub_coeff = numerics.image_interp_bicubic(def_sub_image)
 
+# Compute reference mesh quantities of interest (array, mean, standard deviation)
+f_mesh, f_mean, f_stddev = analysis.ref_mesh_qoi(ref_surf, uv_vals, ref_sub_coeff, ref_sub_image.shape)
+
 # Test synthetically deformed control points
 synth_coords = np.zeros((len(coords), 2))
 for i in range(len(synth_coords)):
@@ -173,12 +165,13 @@ for i in range(len(synth_coords)):
 
 # Compute synthetic control point displacements
 synth_coords_disp = synth_coords - coords
+synth_coords_disp3d = np.column_stack((synth_coords_disp, np.zeros(len(synth_coords_disp))))
 
 # Compute znssd between synthetic and ref coordinates
 pr.enable()
-pdb.set_trace()
-synth_znssd = analysis.mesh_znssd(roi, ref_sub_image.shape, def_sub_image.shape, ref_surf, uv_vals,
-                                  ref_sub_coeff, def_sub_coeff, synth_coords_disp)
+# Compute znssd between synthetic and ref coordinates
+synth_znssd = analysis.mesh_znssd(f_mesh, f_mean, f_stddev, def_sub_image.shape, ref_surf, uv_vals, def_sub_coeff,
+                                  synth_coords_disp3d)
 
 pr.disable()
 pr.dump_stats('mesh_eval_znssd.pstat')
