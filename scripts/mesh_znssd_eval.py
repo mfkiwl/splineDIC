@@ -143,11 +143,12 @@ rowmax = (np.max(coords[:, 1]) - np.min(coords[:, 1])).astype('int')
 # Set reference image mesh over image
 roi = ref_sub_image[min_row_index:max_row_index, min_col_index:max_col_index]
 
-uv_vals = np.zeros((2, )+ roi.shape)
-for i in range(0, rowmax):
-    for j in range(0, colmax):
-        uv_vals[0, i, j] = j / colmax
-        uv_vals[1, i, j] = i / rowmax
+u = np.linspace(0, (rowmax - 1) / rowmax, rowmax)  # weird indexing hack
+v = np.linspace(0, (colmax - 1) / colmax, colmax)
+
+uu, vv = np.meshgrid(u, v)
+
+uv_vals = np.column_stack((uu.ravel(), vv.ravel()))
 
 #TODO: Up to here
 
