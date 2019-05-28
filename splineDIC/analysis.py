@@ -309,7 +309,7 @@ def mesh_znssd(f_mesh, f_mean, f_stddev, def_shape, ref_mesh, uv_vals, def_coeff
             v_val = uv_vals[1, i, j]
 
             # Compute the displacement by interpolating
-            new_pt = def_mesh.surfpt(u_val, v_val)
+            new_pt = def_mesh.single_point(u_val, v_val)
 
             g_mesh[i, j] = numerics.eval_interp_bicubic(def_coeff, new_pt[0], new_pt[1], def_shape)
 
