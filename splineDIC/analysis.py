@@ -196,22 +196,11 @@ def ref_mesh_qoi(ref_mesh, uv_vals, ref_coeffs, ref_image_shape):
     :rtype: tuple
     """
 
-    # Get shape of region of interest
-    shape = uv_vals.shape[1:]
-    rowmax = shape[0]
-    colmax = shape[1]
+    pts = ref_mesh.points(uv_vals)
 
-    f_mesh = np.zeros(shape)
-    # TODO: Vectorize this?
-    for i in range(0, rowmax):
-        for j in range(0, colmax):
-            u_val = uv_vals[0, i, j]
-            v_val = uv_vals[1, i, j]
-
-            # Compute the displacement by interpolating
-            pt = ref_mesh.single_point(u_val, v_val)
-
-            f_mesh[i, j] = numerics.eval_interp_bicubic(ref_coeffs, pt[0], pt[1], ref_image_shape)
+    f_mesh = np.zeros(len(pts))
+    for row in range(0, len(pts)):
+        f_mesh[row] = numerics.eval_interp_bicubic(ref_coeffs, pts[row, 0], pts[row, 1], ref_image_shape)
 
     f_mean = np.mean(f_mesh)
 
@@ -296,22 +285,11 @@ def mesh_znssd(f_mesh, f_mean, f_stddev, def_shape, ref_mesh, uv_vals, def_coeff
     # Get def mesh
     def_mesh = deform_mesh(ref_mesh, cpts_disp)
 
-    # For every pixel in f, compute the new location in g
-    g_mesh = np.zeros(f_mesh.shape)
+    pts = def_mesh.points(uv_vals)
 
-    rowmax = f_mesh.shape[0]
-    colmax = f_mesh.shape[1]
-
-    # TODO: Vectorize this?
-    for i in range(0, rowmax):
-        for j in range(0, colmax):
-            u_val = uv_vals[0, i, j]
-            v_val = uv_vals[1, i, j]
-
-            # Compute the displacement by interpolating
-            new_pt = def_mesh.single_point(u_val, v_val)
-
-            g_mesh[i, j] = numerics.eval_interp_bicubic(def_coeff, new_pt[0], new_pt[1], def_shape)
+    g_mesh = np.zeros(len(pts))
+    for row in range(0, len(pts)):
+        g_mesh[row] = numerics.eval_interp_bicubic(def_coeff, pts[row, 0], pts[row, 1], def_shape)
 
     # Compute mean of this deformed image mesh
     g_mean = np.mean(g_mesh)
