@@ -10,6 +10,7 @@ from . import np
 from . import warnings
 from . import numerics
 from . import signal
+from . import spline
 
 
 def mesh(ref_cpts, degree=3):
@@ -208,7 +209,7 @@ def ref_mesh_qoi(ref_mesh, uv_vals, ref_coeffs, ref_image_shape):
             v_val = uv_vals[1, i, j]
 
             # Compute the displacement by interpolating
-            pt = ref_mesh.surfpt(u_val, v_val)
+            pt = ref_mesh.single_point(u_val, v_val)
 
             f_mesh[i, j] = numerics.eval_interp_bicubic(ref_coeffs, pt[0], pt[1], ref_image_shape)
 
@@ -236,27 +237,28 @@ def deform_mesh(ref_mesh, cpts_disp):
     degu = ref_mesh.degree_u
     degv = ref_mesh.degree_v
 
-    knotvec_u = ref_mesh.knotvector_u
-    knotvec_v = ref_mesh.knotvector_v
+    knotvec_u = ref_mesh.knot_vector_u
+    knotvec_v = ref_mesh.knot_vector_v
 
     # Get control points of reference mesh
-    ref_ctrlpts = np.array(ref_mesh.ctrlpts)
+    ref_ctrlpts = ref_mesh.control_points
 
     num_ctrlpts = np.sqrt(len(ref_ctrlpts)).astype('int')
 
     # Deform control points
     def_ctrlpts = np.column_stack((ref_ctrlpts[:, 0] + cpts_disp[:, 0], ref_ctrlpts[:, 1] + cpts_disp[:, 1]))
+    def_ctrlpts3d = np.column_stack((def_ctrlpts, np.zeros(len(def_ctrlpts))))
 
     # Create deformed mesh
-    def_mesh = bs.Surface()
+    def_mesh = spline.Surface()
 
     def_mesh.degree_u = degu
     def_mesh.degree_v = degv
 
-    def_mesh.set_ctrlpts(def_ctrlpts.tolist(), num_ctrlpts, num_ctrlpts)
+    def_mesh.control_points = def_ctrlpts3d
 
-    def_mesh.knotvector_u = knotvec_u
-    def_mesh.knotvector_v = knotvec_v
+    def_mesh.knot_vector_u = knotvec_u
+    def_mesh.knot_vector_v = knotvec_v
 
     return def_mesh
 
