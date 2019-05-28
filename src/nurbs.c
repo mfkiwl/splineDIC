@@ -55,8 +55,11 @@
     return mid_index;
 }
         
- 
- double basis_functions(int knot_span, double knot, int degree, double knot_vector)
+/*-------------------------------------------------------------------------------------
+  * basis_functions: function for determining the value of a non-zero basis functions at a given knot value
+  *-------------------------------------------------------------------------------------*/
+
+  double basis_functions(int knot_span, double knot, int degree, double knot_vector)
  {
 	 double N[degree + 1] = { 1 };
 	 double left[degree + 1] = { 0 };
@@ -82,3 +85,4 @@
 	 
 	 return N;
  }
+
