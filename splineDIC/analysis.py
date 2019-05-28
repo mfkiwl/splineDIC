@@ -255,6 +255,9 @@ def deform_mesh(ref_mesh, cpts_disp):
     def_mesh.degree_u = degu
     def_mesh.degree_v = degv
 
+    def_mesh.num_ctrlpts_u = num_ctrlpts
+    def_mesh.num_ctrlpts_v = num_ctrlpts
+
     def_mesh.control_points = def_ctrlpts3d
 
     def_mesh.knot_vector_u = knotvec_u
