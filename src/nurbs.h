@@ -11,7 +11,7 @@
 
  #include <string.h>
 
-/* Function prototypes */
+ /* Function prototypes */
 
  #ifndef NURBS_H
  #define NURBS_H
