@@ -5,6 +5,7 @@
 """
 
 from setuptools import setup, find_packages
+from Cython.Build import cythonize
 
 # Meta-data
 NAME = 'splineDIC'
@@ -26,6 +27,7 @@ setup(
     python_requires=REQUIRES_PYTHON,
     url=URL,
     py_modules=['splineDIC'],
+    ext_modules=cythonize('nurbs.pyx'),
     install_requires=REQUIRED,
     license='MIT',
     packages=find_packages()
