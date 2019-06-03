@@ -10,13 +10,14 @@
  /* Includes */
 
  #include <string.h>
+ #include <stdlib.h>
 
  /* Function prototypes */
 
  #ifndef NURBS_H
  #define NURBS_H
 
- int find_span(int num_ctrlpts, int degree, double knot, double knot_vector[]);
+ int find_spanC(int num_ctrlpts, int degree, double knot, double knot_vector[]);
  int basis_functions(double* N, int knot_span, double knot, int degree, double knot_vector[]);
 
  #endif

@@ -13,7 +13,7 @@
 * find_span: function for determining the knot span given a knot value.
 *-------------------------------------------------------------------------------------*/
 
-int find_span(int num_ctrlpts, int degree, double knot, double knot_vector[])
+int find_spanC(int num_ctrlpts, int degree, double knot, double knot_vector[])
 {
     double rtol = 1E-6;
     if(abs(knot - knot_vector[num_ctrlpts]) <= rtol){
