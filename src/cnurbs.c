@@ -16,7 +16,7 @@
 int find_spanC(int num_ctrlpts, int degree, double knot, double knot_vector[])
 {
     double rtol = 1E-6;
-    if(abs(knot - knot_vector[num_ctrlpts]) <= rtol){
+    if(fabs(knot - knot_vector[num_ctrlpts]) <= rtol){
         return num_ctrlpts - 1;
     }
 
