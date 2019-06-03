@@ -16,7 +16,7 @@ EMAIL = 'spotter1642@gmail.com'
 AUTHOR = 'Sam Potter'
 REQUIRES_PYTHON = '>=3.6.0'
 VERSION = 1.0
-REQUIRED = ['numpy', 'scipy', 'opencv', 'matplotlib', 'regex', 'numba', 'cython']
+REQUIRED = ['numpy', 'scipy', 'opencv-python', 'matplotlib', 'regex', 'numba', 'cython']
 
 # Cython
 ext = Extension('nurbs', ['src/cnurbs.c', 'splineDIC/nurbs.pyx'], include_dirs=[np.get_include()])
