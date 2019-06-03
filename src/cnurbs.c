@@ -69,18 +69,18 @@ int basis_functionsC(double* N, int knot_span, double knot, int degree, double k
 
     int j;
     for(j=1; j<=degree; j++){
-     left[j] = knot - knot_vector[knot_span + 1 - j];
-     right[j] = knot_vector[knot_span + j] - knot;
-     saved = 0.0;
+        left[j] = knot - knot_vector[knot_span + 1 - j];
+        right[j] = knot_vector[knot_span + j] - knot;
+        saved = 0.0;
 
-     int r;
-     for(r=0; r<=j; r++){
-         temp = N[r] / (right[r + 1] + left[j - r]);
-         N[r] = saved + right[r + 1] * temp;
-         saved = left[j - r] * temp;
-     }
+        int r;
+        for(r=0; r<j; r++){
+            temp = N[r] / (right[r + 1] + left[j - r]);
+            N[r] = saved + right[r + 1] * temp;
+            saved = left[j - r] * temp;
+        }
 
-     N[j] = saved;
+        N[j] = saved;
 
     }
 
