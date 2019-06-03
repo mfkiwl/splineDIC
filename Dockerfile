@@ -11,5 +11,8 @@ SHELL ["/bin/bash", "-c"]
 ADD environment.yml /tmp/environment.yml
 RUN conda env create -f /tmp/environment.yml
 
+# GCC
+RUN apt-get update && apt-get -y install gcc
+
 # Copy code in
 COPY . /code
