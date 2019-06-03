@@ -7,7 +7,7 @@
 *  nurbs.c: C module for basic B-spline surface constructs
 *-------------------------------------------------------------------------------------*/
  
-#include "nurbs.h"
+#include "cnurbs.h"
 
 /*-------------------------------------------------------------------------------------
 * find_span: function for determining the knot span given a knot value.
