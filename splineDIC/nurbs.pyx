@@ -22,7 +22,7 @@ cdef extern from "../src/cnurbs.h":
 
 def basis_functions(N, knot_span, knot, degree, knot_vector):
 
-    if not N.flags['C_ CONTIGUOUS']:
+    if not N.flags['C_CONTIGUOUS']:
         N = np.ascontiguousarray(N)
 
     if not knot_vector.flags['C_CONTIGUOUS']:
