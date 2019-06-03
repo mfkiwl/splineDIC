@@ -7,7 +7,7 @@ cdef extern from "../src/nurbs.c":
 
 cdef extern from "../src/nurbs.h":
 
-    int find_span(unsigned int, unsigned int, double, double *)
+    int find_spanC(unsigned int, unsigned int, double, double *)
 
 def find_span(num_ctrlpts, degree, knot, knot_vector):
 
@@ -16,6 +16,6 @@ def find_span(num_ctrlpts, degree, knot, knot_vector):
 
     cdef double[::1] kv_memview = knot_vector
 
-    span = find_span(num_ctrlpts, degree, knot, &kv_memview[0])
+    span = find_spanC(num_ctrlpts, degree, knot, &kv_memview[0])
 
     return span
