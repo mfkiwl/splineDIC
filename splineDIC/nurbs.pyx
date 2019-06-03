@@ -1,10 +1,6 @@
 cimport cython
 import numpy as np
 
-cdef extern from "../src/cnurbs.c":
-
-    pass
-
 cdef extern from "../src/cnurbs.h":
 
     int find_spanC(unsigned int, unsigned int, double, double *)
