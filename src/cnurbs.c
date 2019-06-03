@@ -58,7 +58,7 @@ int find_spanC(int num_ctrlpts, int degree, double knot, double knot_vector[])
 * basis_functions: function for determining the value of a non-zero basis functions at a given knot value
 *-------------------------------------------------------------------------------------*/
 
-int basis_functions(double* N, int knot_span, double knot, int degree, double knot_vector[])
+int basis_functionsC(double* N, int knot_span, double knot, int degree, double knot_vector[])
 {
     double left[degree + 1];
     memset( left, 0, (degree + 1) * sizeof(double));
