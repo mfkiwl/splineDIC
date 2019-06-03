@@ -60,15 +60,15 @@ int find_spanC(int num_ctrlpts, int degree, double knot, double knot_vector[])
 
 int basis_functions(double* N, int knot_span, double knot, int degree, double knot_vector[])
 {
- double left[degree + 1];
- memset( left, 0, (degree + 1) * sizeof(double));
- double right[degree + 1];
- memset( right, 0, (degree + 1) * sizeof(double));
- double saved;
- double temp;
+    double left[degree + 1];
+    memset( left, 0, (degree + 1) * sizeof(double));
+    double right[degree + 1];
+    memset( right, 0, (degree + 1) * sizeof(double));
+    double saved;
+    double temp;
 
- int j;
- for(j=1; j<=degree; j++){
+    int j;
+    for(j=1; j<=degree; j++){
      left[j] = knot - knot_vector[knot_span + 1 - j];
      right[j] = knot_vector[knot_span + j] - knot;
      saved = 0.0;
@@ -82,7 +82,7 @@ int basis_functions(double* N, int knot_span, double knot, int degree, double kn
 
      N[j] = saved;
 
- }
+    }
 
- return 0;
+    return 0;
 }
