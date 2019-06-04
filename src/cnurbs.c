@@ -91,7 +91,7 @@ int basis_functionsC(double* N, int knot_span, double knot, int degree, double k
 * surface_point: function for finding the value of a spline surface at a given u, v value
 *-------------------------------------------------------------------------------------*/
 
-double surface_pointC(int ncpts_u, int deg_u, double kv_u[], int ncpts_v, int deg_v, double kv_v[], double P[][], double u, double v)
+double surface_pointC(int ncpts_u, int deg_u, double kv_u[], int ncpts_v, int deg_v, double kv_v[], double P[], double u, double v)
 {
 
     // Compute spans
@@ -124,7 +124,7 @@ double surface_pointC(int ncpts_u, int deg_u, double kv_u[], int ncpts_v, int de
         vind = vspan - deg_v + i;
         int j;
         for(j=0; j<=deg_u; j++){
-            temp = temp + Nu[j] * P[uind + j][vind];
+            temp = temp + Nu[j] * P[j * ncpts_v + uind * ncpts_v + vind] ;
         }
         S = S + Nv[i] * temp;
     }
