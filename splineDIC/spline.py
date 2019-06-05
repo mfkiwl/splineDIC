@@ -10,6 +10,7 @@ from . import np
 from . import knots
 from . import basis
 from . import fileIO
+from . import nurbs
 
 
 class Surface:
@@ -275,29 +276,14 @@ class Surface:
         if not (0 <= v <= 1):
             raise ValueError('v parameter must be in interval [0, 1]')
 
-        # Get knot spans
-        u_span = knots.find_span(self._num_ctrlpts_u, self._degree_u, u, self._knot_vector_u)
-        v_span = knots.find_span(self._num_ctrlpts_v, self._degree_v, v, self._knot_vector_v)
-
-        # Evaluate basis functions
-        basis_funs_u = basis.basis_functions(u_span, u, self._degree_u, self._knot_vector_u)
-        basis_funs_v = basis.basis_functions(v_span, v, self._degree_v, self._knot_vector_v)
-
         # Create the matrix of control point values
         ctrlpt_x = self._control_points[:, 0]
         ctrlpt_y = self._control_points[:, 1]
         ctrlpt_z = self._control_points[:, 2]
 
-        x_array = np.reshape(ctrlpt_x, (self._num_ctrlpts_u, self._num_ctrlpts_v))
-        y_array = np.reshape(ctrlpt_y, (self._num_ctrlpts_u, self._num_ctrlpts_v))
-        z_array = np.reshape(ctrlpt_z, (self._num_ctrlpts_u, self._num_ctrlpts_v))
-
-        x = basis_funs_u @ x_array[u_span - self._degree_u:u_span + 1, v_span - self._degree_v:v_span + 1] \
-            @ basis_funs_v
-        y = basis_funs_u @ y_array[u_span - self._degree_u:u_span + 1, v_span - self._degree_v:v_span + 1] \
-            @ basis_funs_v
-        z = basis_funs_u @ z_array[u_span - self._degree_u:u_span + 1, v_span - self._degree_v:v_span + 1] \
-            @ basis_funs_v
+        x = nurbs.surface_point(self._num_ctrlpts_u, self._degree_u, self._knot_vector_u, self._num_ctrlpts_v, self._degree_v, self._knot_vector_v, ctrlpt_x, u, v)
+        y = nurbs.surface_point(self._num_ctrlpts_u, self._degree_u, self._knot_vector_u, self._num_ctrlpts_v, self._degree_v, self._knot_vector_v, ctrlpt_y, u, v)
+        z = nurbs.surface_point(self._num_ctrlpts_u, self._degree_u, self._knot_vector_u, self._num_ctrlpts_v, self._degree_v, self._knot_vector_v, ctrlpt_z, u, v)
 
         point = np.array([x, y, z])
 

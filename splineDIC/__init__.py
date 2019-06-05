@@ -21,3 +21,4 @@ import warnings
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from scipy.ndimage import sobel
 from numba import jit
+import nurbs
