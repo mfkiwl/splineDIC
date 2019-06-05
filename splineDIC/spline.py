@@ -325,9 +325,19 @@ class Surface:
         u = knot_array[:, 0]
         v = knot_array[:, 1]
 
-        errx = nurbs.surface_points(x, self._num_ctrlpts_u, self._degree_u, self._knot_vector_u, self._num_ctrlpts_v, self._degree_v, self._knot_vector_v, ctrlpt_x, u, v, len(knot_array))
-        erry = nurbs.surface_points(y, self._num_ctrlpts_u, self._degree_u, self._knot_vector_u, self._num_ctrlpts_v, self._degree_v, self._knot_vector_v, ctrlpt_y, u, v, len(knot_array))
-        errz = nurbs.surface_points(z, self._num_ctrlpts_u, self._degree_u, self._knot_vector_u, self._num_ctrlpts_v, self._degree_v, self._knot_vector_v, ctrlpt_z, u, v, len(knot_array))
+        # Pull out surface details
+        ncpts_u = self._num_ctrlpts_u
+        ncpts_v = self._num_ctrlpts_v
+
+        deg_u = self._degree_u
+        deg_v = self._degree_v
+
+        knot_vector_u = self._knot_vector_u
+        knot_vector_v = self._knot_vector_v
+
+        errx = nurbs.surface_points(x, ncpts_u, deg_u, knot_vector_u, ncpts_v, deg_v, knot_vector_v, ctrlpt_x, u, v, len(knot_array))
+        erry = nurbs.surface_points(y, ncpts_u, deg_u, knot_vector_u, ncpts_v, deg_v, knot_vector_v, ctrlpt_y, u, v, len(knot_array))
+        errz = nurbs.surface_points(z, ncpts_u, deg_u, knot_vector_u, ncpts_v, deg_v, knot_vector_v, ctrlpt_z, u, v, len(knot_array))
 
         values = np.column_stack((x, y, z))
 
