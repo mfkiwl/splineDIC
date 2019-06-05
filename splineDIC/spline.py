@@ -311,7 +311,25 @@ class Surface:
         if knot_array.ndim != 2.0:
             raise ValueError('Parameter array must be 2D')
 
-        values = [self.single_point(parameter[0], parameter[1]) for parameter in knot_array]
+        # Initialize arrays to hold x, y, z outputs
+        x = np.zeros(len(knot_array))
+        y = np.zeros(len(knot_array))
+        z = np.zeros(len(knot_array))
+
+        # Create the matrix of control point values
+        ctrlpt_x = self._control_points[:, 0]
+        ctrlpt_y = self._control_points[:, 1]
+        ctrlpt_z = self._control_points[:, 2]
+
+        # Split knots into u, v
+        u = knot_array[:, 0]
+        v = knot_array[:, 1]
+
+        errx = nurbs.surface_points(x, self._num_ctrlpts_u, self._degree_u, self._knot_vector_u, self._num_ctrlpts_v, self._degree_v, self._knot_vector_v, ctrlpt_x, u, v, len(knot_array))
+        erry = nurbs.surface_points(y, self._num_ctrlpts_u, self._degree_u, self._knot_vector_u, self._num_ctrlpts_v, self._degree_v, self._knot_vector_v, ctrlpt_y, u, v, len(knot_array))
+        errz = nurbs.surface_points(z, self._num_ctrlpts_u, self._degree_u, self._knot_vector_u, self._num_ctrlpts_v, self._degree_v, self._knot_vector_v, ctrlpt_z, u, v, len(knot_array))
+
+        values = np.column_stack((x, y, z))
 
         return np.array(values)
 
