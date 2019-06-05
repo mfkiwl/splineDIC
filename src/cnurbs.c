@@ -102,9 +102,18 @@ double surface_pointC(int ncpts_u, int deg_u, double kv_u[], int ncpts_v, int de
 
     // Compute basis functions
     double Nu[deg_u + 1];
-    memset( Nu, 0, (deg_u + 1) * sizeof(double));
+    memset( Nu, 0.0, (deg_u + 1) * sizeof(double));
     double Nv[deg_v + 1];
-    memset( Nv, 0, (deg_v + 1) * sizeof(double));
+    memset( Nv, 0.0, (deg_v + 1) * sizeof(double));
+
+    int n;
+    int m;
+    for(n=0; n<=deg_u; n++){
+        Nu[n] = 1.0;
+    }
+    for(m=0; m<=deg_v; m++){
+        Nv[m] = 1.0;
+    }
 
     int erru;
     erru = basis_functionsC(Nu, uspan, u, deg_u, kv_u);
