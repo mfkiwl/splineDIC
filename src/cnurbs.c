@@ -141,3 +141,18 @@ double surface_pointC(int ncpts_u, int deg_u, double kv_u[], int ncpts_v, int de
     return S;
 
 }
+
+/*-------------------------------------------------------------------------------------
+* surface_points: function for finding the value of a spline surface at multiple u, v values
+*-------------------------------------------------------------------------------------*/
+
+int surface_pointsC(double* S, int ncpts_u, int deg_u, double kv_u[], int ncpts_v, int deg_v, double kv_v[], double P[], double u[], double v[], int npts)
+{
+    int i;
+    for(i=0; i<=npts; i++){
+        S[i] = surface_pointC(ncpts_u, deg_u, kv_u, ncpts_v, deg_v, kv_v, P, u[i], v[i]);
+    }
+
+    return 0;
+
+}
