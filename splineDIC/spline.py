@@ -335,9 +335,11 @@ class Surface:
         knot_vector_u = self._knot_vector_u
         knot_vector_v = self._knot_vector_v
 
-        errx = nurbs.surface_points(x, ncpts_u, deg_u, knot_vector_u, ncpts_v, deg_v, knot_vector_v, ctrlpt_x, u, v, len(knot_array))
-        erry = nurbs.surface_points(y, ncpts_u, deg_u, knot_vector_u, ncpts_v, deg_v, knot_vector_v, ctrlpt_y, u, v, len(knot_array))
-        errz = nurbs.surface_points(z, ncpts_u, deg_u, knot_vector_u, ncpts_v, deg_v, knot_vector_v, ctrlpt_z, u, v, len(knot_array))
+        npts = len(knot_array)
+
+        errx = nurbs.surface_points(x, ncpts_u, deg_u, knot_vector_u, ncpts_v, deg_v, knot_vector_v, ctrlpt_x, u, v, npts)
+        erry = nurbs.surface_points(y, ncpts_u, deg_u, knot_vector_u, ncpts_v, deg_v, knot_vector_v, ctrlpt_y, u, v, npts)
+        errz = nurbs.surface_points(z, ncpts_u, deg_u, knot_vector_u, ncpts_v, deg_v, knot_vector_v, ctrlpt_z, u, v, npts)
 
         values = np.column_stack((x, y, z))
 

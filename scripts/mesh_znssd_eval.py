@@ -111,8 +111,8 @@ coords3d = np.column_stack((coords, np.zeros(len(coords))))
 # Surface
 ref_surf = spline.Surface()
 
-ref_surf.degree_u = 3
-ref_surf.degree_v = 3
+ref_surf.degree_u = 2
+ref_surf.degree_v = 2
 
 num_ctrlpts = np.sqrt(len(coords)).astype('int')
 ref_surf.num_ctrlpts_u = num_ctrlpts
@@ -155,6 +155,8 @@ uv_vals = np.column_stack((uu.ravel(), vv.ravel()))
 # Get interpolation coefficients
 ref_sub_coeff = numerics.image_interp_bicubic(ref_sub_image)
 def_sub_coeff = numerics.image_interp_bicubic(def_sub_image)
+
+foo = ref_surf.points(uv_vals)
 
 # Compute reference mesh quantities of interest (array, mean, standard deviation)
 f_mesh, f_mean, f_stddev = analysis.ref_mesh_qoi(ref_surf, uv_vals, ref_sub_coeff, ref_sub_image.shape)
