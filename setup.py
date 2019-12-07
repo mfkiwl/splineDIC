@@ -9,7 +9,7 @@ from Cython.Build import cythonize
 import numpy as np
 
 # Meta-data
-NAME = 'splineDIC'
+NAME = 'splinedic'
 DESCRIPTION = 'Digital image correlation using spline basis functions'
 URL = 'https://github.com/stpotter16/splineDIC'
 EMAIL = 'spotter1642@gmail.com'
